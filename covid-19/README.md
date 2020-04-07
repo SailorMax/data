@@ -1,0 +1,8 @@
+Update time = 03:00 UTC
+
+| files                    | description    |
+| ------------------------ | -------------- |
+| 31days_covid19_merged_global.csv             | most actual data with all required info in format "confirmed/recovered/deaths" |
+| time_series_covid19_confirmed_global.csv     | similar to Data Repository by Johns Hopkins CSSE, but with US states and Russian regions |
+| time_series_covid19_recovered_global.csv     | -//-  |
+| time_series_covid19_deaths_global.csv        | -//- |
