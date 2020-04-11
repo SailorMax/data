@@ -1,26 +1,26 @@
 alpha-2,name,population
-AD,Andorra,84000
+AD,Andorra,76177
 AE,United Arab Emirates,4975593
 AF,Afghanistan,29121286
 AG,Antigua and Barbuda,86754
 AI,Anguilla,13254
-AL,Albania,2986952
-AM,Armenia,2968000
+AL,Albania,2862427
+AM,Armenia,2965269
 AN,Netherlands Antilles,304759
 AO,Angola,13068161
 AR,Argentina,41343201
 AS,American Samoa,57881
-AT,Austria,8205000
+AT,Austria,8858775
 AU,Australia,21515754
 AW,Aruba,71566
 AX,Aland Islands,29789
-AZ,Azerbaijan,8303512
-BA,Bosnia and Herzegovina,4590000
+AZ,Azerbaijan,9981457
+BA,Bosnia and Herzegovina,3502550
 BB,Barbados,285653
 BD,Bangladesh,156118464
-BE,Belgium,10403000
+BE,Belgium,11455519
 BF,Burkina Faso,16241811
-BG,Bulgaria,7148785
+BG,Bulgaria,7000039
 BH,Bahrain,738004
 BI,Burundi,9863117
 BJ,Benin,9056010
@@ -33,14 +33,14 @@ BR,Brazil,201103330
 BS,Bahamas,301790
 BT,Bhutan,699847
 BW,Botswana,2029307
-BY,Belarus,9685000
+BY,Belarus,9475174
 BZ,Belize,314522
 CA,Canada,33679000
 CC,Cocos Islands,628
 CD,Congo (Kinshasa),70916439
 CF,Central African Republic,4844927
 CG,Congo (Brazzaville),3039126
-CH,Switzerland,7581000
+CH,Switzerland,8544527
 CI,Cote d'Ivoire,21058798
 CK,Cook Islands,21388
 CL,Chile,16746491
@@ -53,31 +53,31 @@ CU,Cuba,11423000
 CV,Cabo Verde,508659
 CW,Curacao,141766
 CX,Christmas Island,1500
-CY,Cyprus,1102677
-CZ,Czechia,10476000
-DE,Germany,81802257
+CY,Cyprus,875899
+CZ,Czechia,10649800
+DE,Germany,83019213
 DJ,Djibouti,740528
-DK,Denmark,5484000
+DK,Denmark,5806081
 DM,Dominica,72813
 DO,Dominican Republic,9823821
 DZ,Algeria,34586184
 EC,Ecuador,14790608
-EE,Estonia,1291170
+EE,Estonia,1324820
 EG,Egypt,80471869
 EH,Western Sahara,273008
 ER,Eritrea,5792984
-ES,Spain,46505963
+ES,Spain,46937060
 ET,Ethiopia,88013491
-FI,Finland,5244000
+FI,Finland,5517919
 FJ,Fiji,875983
 FK,Falkland Islands,2638
 FM,Micronesia,107708
 FO,Faroe Islands,48228
-FR,France,64768389
+FR,France,67012883
 GA,Gabon,1545255
-GB,United Kingdom,62348447
+GB,United Kingdom,66647112
 GD,Grenada,107818
-GE,Georgia,4630000
+GE,Georgia,3723464
 GF,French Guiana,195506
 GG,Guernsey,65228
 GH,Ghana,24339838
@@ -87,7 +87,7 @@ GM,Gambia,1593256
 GN,Guinea,10324025
 GP,Guadeloupe,443000
 GQ,Equatorial Guinea,1014999
-GR,Greece,11000000
+GR,Greece,10724599
 GS,South Georgia and the South Sandwich Islands,30
 GT,Guatemala,13550440
 GU,Guam,159358
@@ -96,19 +96,19 @@ GY,Guyana,748486
 HK,Hong Kong,6898686
 HM,Heard Island and McDonald Islands,0
 HN,Honduras,7989415
-HR,Croatia,4284889
+HR,Croatia,4076246
 HT,Haiti,9648924
-HU,Hungary,9982000
+HU,Hungary,9772756
 ID,Indonesia,242968342
-IE,Ireland,4622917
+IE,Ireland,4904240
 IL,Israel,7353985
 IM,Isle of Man,75049
 IN,India,1173108018
 IO,British Indian Ocean Territory,4000
 IQ,Iraq,29671605
 IR,Iran,76923300
-IS,Iceland,308910
-IT,Italy,60340328
+IS,Iceland,356991
+IT,Italy,60359546
 JE,Jersey,90812
 JM,Jamaica,2847232
 JO,Jordan,6407085
@@ -127,22 +127,22 @@ KZ,Kazakhstan,15340000
 LA,Laos,6368162
 LB,Lebanon,4125247
 LC,Saint Lucia,160922
-LI,Liechtenstein,35000
+LI,Liechtenstein,38378
 LK,Sri Lanka,21513990
 LR,Liberia,3685076
 LS,Lesotho,1919552
-LT,Lithuania,2944459
-LU,Luxembourg,497538
+LT,Lithuania,2794184
+LU,Luxembourg,613894
 LV,Latvia,1919968
 LY,Libya,6461454
 MA,Morocco,31627428
-MC,Monaco,32965
-MD,Moldova,4324000
-ME,Montenegro,666730
+MC,Monaco,38300
+MD,Moldova,3547539
+ME,Montenegro,622182
 MF,Saint Martin (French part),35925
 MG,Madagascar,21281844
 MH,Marshall Islands,65859
-MK,North Macedonia,2062294
+MK,North Macedonia,2077132
 ML,Mali,13796354
 MM,Burma,53414374
 MN,Mongolia,3086918
@@ -151,7 +151,7 @@ MP,Northern Mariana Islands,53883
 MQ,Martinique,432900
 MR,Mauritania,3205060
 MS,Montserrat,9341
-MT,Malta,403000
+MT,Malta,493559
 MU,Mauritius,1294104
 MV,Maldives,395650
 MW,Malawi,15447500
@@ -164,8 +164,8 @@ NE,Niger,15878271
 NF,Norfolk Island,1828
 NG,Nigeria,154000000
 NI,Nicaragua,5995928
-NL,Netherlands,16645000
-NO,Norway,5009150
+NL,Netherlands,17282163
+NO,Norway,5328212
 NP,Nepal,28951852
 NR,Nauru,10065
 NU,Niue,2166
@@ -177,32 +177,32 @@ PF,French Polynesia,270485
 PG,Papua New Guinea,6064515
 PH,Philippines,99900177
 PK,Pakistan,184404791
-PL,Poland,38500000
+PL,Poland,37972812
 PM,Saint Pierre and Miquelon,7012
 PN,Pitcairn,46
 PR,Puerto Rico,3916632
 PS,West Bank and Gaza,3800000
-PT,Portugal,10676000
+PT,Portugal,10276617
 PW,Palau,19907
 PY,Paraguay,6375830
 QA,Qatar,840926
 RE,Reunion,776948
-RO,Romania,21959278
-RS,Serbia,7344847
-RU,Russia,140702000
+RO,Romania,19414458
+RS,Serbia,6963764
+RU,Russia,143666931
 RW,Rwanda,11055976
 SA,Saudi Arabia,25731776
 SB,Solomon Islands,559198
 SC,Seychelles,88340
 SD,Sudan,35000000
-SE,Sweden,9828655
+SE,Sweden,10230185
 SG,Singapore,4701069
 SH,"Saint Helena, Ascension and Tristan da Cunha",7460
-SI,Slovenia,2007000
+SI,Slovenia,2080908
 SJ,Svalbard and Jan Mayen,2550
-SK,Slovakia,5455000
+SK,Slovakia,5450421
 SL,Sierra Leone,5245695
-SM,San Marino,31477
+SM,San Marino,34590
 SN,Senegal,12323252
 SO,Somalia,10112453
 SR,Suriname,492829
@@ -223,12 +223,12 @@ TL,East Timor,1154625
 TM,Turkmenistan,4940916
 TN,Tunisia,10589025
 TO,Tonga,122580
-TR,Turkey,77804122
+TR,Turkey,82003882
 TT,Trinidad and Tobago,1228691
 TV,Tuvalu,10472
 TW,Taiwan*,22894384
 TZ,Tanzania,41892895
-UA,Ukraine,45415596
+UA,Ukraine,41983564
 UG,Uganda,33398682
 UM,United States Minor Outlying Islands,300
 US,US,310232863
@@ -243,7 +243,7 @@ VN,Vietnam,89571130
 VU,Vanuatu,221552
 WF,Wallis and Futuna,16025
 WS,Samoa,192001
-XK,Kosovo,1800000
+XK,Kosovo,1795666
 YE,Yemen,23495361
 YT,Mayotte,159042
 ZA,South Africa,49000000
