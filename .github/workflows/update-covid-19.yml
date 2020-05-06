@@ -16,18 +16,20 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-          extensions: mbstring, intl
-          ini-values: memory_limit=256M, short_open_tag=On
+         run: php -i
+ #       uses: shivammathur/setup-php@v2
+ #       with:
+ #         php-version: '7.4'
+ #         extensions: mbstring, intl
+ #         ini-values: memory_limit=256M, short_open_tag=On
           
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Run update script
-        run: php -f covid-19/scripts/update_data.php ../
+     - name: Run update script
+        run: php -r "print file_get_contents('https://raw.githubusercontent.com/SailorMax/data/master/covid-19/README.md');"
+#        run: php -f covid-19/scripts/update_data.php ../
           
       - name: Commit files
         run: |
@@ -35,7 +37,7 @@ jobs:
           git config --local user.name "GitHub Action"
 #          git add -A
 #          git commit -m "Counting summary once a day"
-      - name: Push changes
+#      - name: Push changes
 #        uses: ad-m/github-push-action@master
 #        with:
 #          github_token: ${{ secrets.GITHUB_TOKEN }}
