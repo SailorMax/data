@@ -22,7 +22,14 @@ jobs:
  #         php-version: '7.4'
  #         extensions: mbstring, intl
  #         ini-values: memory_limit=256M, short_open_tag=On
-          
+
+      - name: Check home
+        run: |
+          pwd
+          ls -l
+          git status
+          git log -1
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v2
