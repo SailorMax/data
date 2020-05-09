@@ -26,6 +26,7 @@ jobs:
       - name: Check home
         run: |
           pwd
+          cd ../
           ls -l
           git status
           git log -1
