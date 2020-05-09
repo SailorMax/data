@@ -1,0 +1,16 @@
+{
+	"COUNTRY_GROUPS": {
+		"European Union":	["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"],
+		"Middle East":		["BH", "CY", "EG", "IR", "IQ", "IL", "JO", "KW", "LB", "OM", "PS", "QA", "SA", "SY", "TR", "AE", "YE"]
+	},
+
+	"TOP_REGIONS": {
+		"World":			[],
+		"European Union":	"European Union",
+		"Middle East":		"Middle East",
+		"Russia-regions":	"Russia / ∑",
+		"US-regions":		"US / ∑",
+		"China-regions":	"China / ∑",
+		"India":			"IN"
+	}
+}
