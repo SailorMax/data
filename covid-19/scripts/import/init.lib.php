@@ -35,6 +35,12 @@ class COVID19DATA
 			while ($data_row = fgetcsv($fp, 0, ",", '"', "\\"))
 			{
 				$first_value = $data_row[0];
+				if (!$countries_data)
+				{
+					$first_value = $this->RemoveBomOfTextData($first_value);
+					$data_row[0] = $first_value;
+				}
+
 				if (isset($country_labels[$first_value]))
 				{
 					$countries_data[$first_value] = $data_row;
@@ -85,9 +91,40 @@ class COVID19DATA
 		}
 	}
 
+	function RemoveBomOfTextData($text)
+	{
+		// remove BOM of UTF8
+		$bom = pack ('H*', 'EFBBBF');
+		if (substr($text, 0, strlen($bom)) == $bom)
+			return substr($text, strlen($bom));
+		return $text;
+	}
+
+	function GetRegionByName($country_name, $region_name = null, $country_iso = null, $region_iso = null)
+	{
+		if (isset($this->regions[$country_name."/".$region_name]))
+			return $this->regions[$country_name."/".$region_name];
+		if ($country_iso)
+		{
+			// search by iso
+			foreach ($this->regions as $region)
+				if (($region["country_iso"] == $country_iso) && ($region["region_iso"] == $region_iso))
+					return $region;
+
+			// some regions looks like separately countries, like UK colonies (Anguilla, Bermuda,..)
+			if (!$region_name && !$region_iso)
+				foreach ($this->regions as $region)
+					if (($country_name == $region["region_name"]) && ($region["region_iso"] == ($country_iso."-".$country_iso)))
+						return $region;
+		}
+		return null;
+	}
+
 	function SaveDatabase()
 	{
 		$fp = fopen($this->db_path, "w");
+		if ($fp === false)
+			trigger_error("Can't open database for write!", E_USER_ERROR);
 
 		$lists = array(
 					"country_name"	=> array("Country", ""),
@@ -100,6 +137,8 @@ class COVID19DATA
 					);
 		$min_date = -1;
 		$max_date = -1;
+
+		ksort($this->regions);
 
 		foreach ($this->regions as $region_key => $region)
 		{
@@ -142,7 +181,7 @@ class COVID19DATA
 				{
 					if (isset($region["timeline"][$row_date][$data_type]))
 					{
-						$row[] = $region["timeline"][$row_date][$data_type];
+						$row[] = intval($region["timeline"][$row_date][$data_type]);
 						$row_has_data = true;
 					}
 					else
@@ -204,11 +243,7 @@ class COVID19DATA
 */
 			$import_file = file_get_contents($import_uri);
 
-		// remove BOM
-		$bom = pack ('H*', 'EFBBBF');
-		if (substr($import_file, 0, strlen($bom)) == $bom)
-			$import_file = substr($import_file, strlen($bom));
-
+		$import_file = $this->RemoveBomOfTextData($import_file);
 		$import_csv = array_map('str_getcsv', explode("\n", rtrim($import_file)));
 		array_walk($import_csv, function(&$a) use ($import_csv) { $a = array_combine($import_csv[0], $a); } );
 		array_shift($import_csv); # remove column header
@@ -225,7 +260,7 @@ class COVID19DATA
 		foreach ($import_urls as $import_name => $import_uri)
 		{
 			$import_csv = $this->GetCsvDataByUri($import_uri);
-			if ($import_csv && (isset($import_csv[0]["Province_State"]) || isset($import_csv[0]["Province/State"])))
+			if ($import_csv && (isset($import_csv[0]["Province_State"]) || isset($import_csv[0]["Province/State"]) || isset($import_csv[0]["total_tests"])))
 				$funcCollectNewData($this->new_data, $import_csv, $import_name, $first_day_limiter_ts);
 			else
 				trigger_error("COVID-19: Loaded content is broken (".$import_name.")!", E_USER_ERROR);
@@ -365,7 +400,8 @@ class COVID19DATA
 				{
 					// fill and make same fields order
 					foreach ($update_stat_fields as $field_name)
-						$region_row["timeline"][$date][$field_name] = $data[$field_name];
+						if (isset($data[$field_name]))
+							$region_row["timeline"][$date][$field_name] = $data[$field_name];
 					ksort($region_row["timeline"]);
 					//
 				}
@@ -471,6 +507,7 @@ class COVID19DATA
 		$dates = array();
 		$regions = array();
 
+		ksort($this->regions);
 		foreach ($this->regions as $region)
 		{
 			if ($country_name && ($country_name != $region["country_name"]))

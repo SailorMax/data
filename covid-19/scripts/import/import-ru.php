@@ -102,10 +102,10 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 
 			foreach ($value_types as $src_name => $target_name)
 			{
-				if (isset($new_data[ $data_key ]["timeline"][$stat_date][$target_name]))
-					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] += $stat[$src_name];
-				else
-					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] = $stat[$src_name];
+//				if (isset($new_data[ $data_key ]["timeline"][$stat_date][$target_name]))
+//					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] += intval($stat[$src_name]);
+//				else
+					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] = intval($stat[$src_name]);
 			}
 		}
 	}

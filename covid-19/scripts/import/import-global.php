@@ -107,9 +107,9 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 											);
 
 			if (isset($new_data[ $data_key ]["timeline"][$stat_date][$values_name]))
-				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] += $region[$date];
+				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] += intval($region[$date]);
 			else
-				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] = $region[$date];
+				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] = intval($region[$date]);
 		}
 
 };

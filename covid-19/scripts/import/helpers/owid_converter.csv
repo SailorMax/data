@@ -1,0 +1,14 @@
+source_iso,source_name,country_iso,region_iso,comment
+BQ,Bonaire Sint Eustatius and Saba,NL,NL-BQ,
+CW,Curacao,NL,NL-CW,
+FK,Falkland Islands,GB,FK-FK,
+FO,Faeroe Islands,DK,FO-FO,
+GG,Guernsey,GK,,
+GU,Guam,US,US-GU,
+HK,Hong Kong,CN,CN-91,
+IM,Isle of Man,GB,GB-IOM,
+JE,Jersey,JE,,
+MP,Northern Mariana Islands,US,US-MP,
+PR,Puerto Rico,US,US-PR,
+SX,Sint Maarten (Dutch part),-,-,Not sure where to put it
+VI,United States Virgin Islands,US,US-VI,
