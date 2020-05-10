@@ -26,17 +26,17 @@ jobs:
       - name: Check home
         run: |
           pwd
-          cd ../
-          ls -l
-          git status
-          git log -1
+          cd /home
+          ls -lR
+#          git status
+#          git log -1
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
-        uses: actions/checkout@v2
+ #     - name: Checkout
+ #       uses: actions/checkout@v2
 
       - name: Run update script
-        run: php -r "print file_get_contents('https://raw.githubusercontent.com/SailorMax/data/master/covid-19/README.md');"
+        run: php -r "mail('sailormax@live.com', 'test from actions', 'some message')"
 #        run: php -f covid-19/scripts/update_data.php ../
           
       - name: Commit files
