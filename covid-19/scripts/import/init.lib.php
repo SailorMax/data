@@ -555,8 +555,16 @@ class COVID19DATA
 
 		// header
 		$csv_header = array_values($export_fields);
-		foreach ($dates as $date)
-			$csv_header[] = date("n/d/y", strtotime($date));	// similar to https://github.com/CSSEGISandData/COVID-19
+		if ($value_type)
+		{
+			foreach ($dates as $date)
+				$csv_header[] = date("n/d/y", strtotime($date));	// similar to https://github.com/CSSEGISandData/COVID-19
+		}
+		else	// global my format
+		{
+			foreach ($dates as $date)
+				$csv_header[] = date("Y-m-d", strtotime($date));
+		}
 		fputcsv($fp, $csv_header);
 
 		// data
@@ -589,13 +597,15 @@ class COVID19DATA
 				else	// merged
 				{
 					if (isset($region_timeline[$date]))
-						$row[] = ($region_timeline[$date]["confirmed"] ?: 0)
+						$row[] = ($region_timeline[$date]["tested"] ?: 0)
+									. "/"
+									. ($region_timeline[$date]["confirmed"] ?: 0)
 									. "/"
 									. ($region_timeline[$date]["recovered"] ?: 0)
 									. "/"
 									. ($region_timeline[$date]["deaths"] ?: 0);
 					else
-						$row[] = "0/0/0";
+						$row[] = "0/0/0/0";
 				}
 			}
 
