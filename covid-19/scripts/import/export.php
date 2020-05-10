@@ -28,7 +28,7 @@ if ($broken_regions)
 					"body"			=> "Regions has broken values: " . $COVID19DATA->DB_QUERY . "\n\nDetails:\n".implode("\n", $details),
 					);
 	mail($email_args["to"], $email_args["subject"], $email_args["body"]);
-	trigger_error($email_args["body"], E_USER_ERROR);
+	trigger_error($email_args["body"], E_USER_WARNING);
 }
 //
 
