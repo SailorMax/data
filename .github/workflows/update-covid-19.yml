@@ -25,9 +25,8 @@ jobs:
 
       - name: Check home
         run: |
+          whoami
           pwd
-          cd /home
-          ls -lR
 #          git status
 #          git log -1
 
@@ -36,13 +35,17 @@ jobs:
  #       uses: actions/checkout@v2
 
       - name: Run update script
-        run: php -r "mail('sailormax@live.com', 'test from actions', 'some message');"
+        run: php -r "mail('sailormax@live.com', 'test from actions', 'some message', 'From\:\ notifications@github.com'); sleep(50);"
 #        run: php -f covid-19/scripts/update_data.php ../
-          
-      - name: Commit files
+
+      - name: Check emails
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          tail /var/log/mail.log
+
+#      - name: Commit files
+#        run: |
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
 #          git add -A
 #          git commit -m "Counting summary once a day"
 #      - name: Push changes
