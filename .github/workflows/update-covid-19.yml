@@ -4,7 +4,7 @@ name: Update COVID-19 data
 # events but only for the master branch OR schedule cron
 on:
   schedule:
-  - cron: '30 4 * * *'
+  - cron: '05 8 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -41,7 +41,7 @@ jobs:
 
       - name: Check emails
         run: |
-          tail /var/log/mail.log
+          sudo tail /var/log/mail.log
 
 #      - name: Commit files
 #        run: |
