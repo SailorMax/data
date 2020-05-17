@@ -30,7 +30,7 @@ class Covid19Data
 		this.use_last_x_days = use_last_x_days;
 
 		this.ms_in_day = 24*60*60*1000;
-		this.value_field_names = ["confirmed", "recovered", "deaths"];
+		this.value_field_names = ["tested", "confirmed", "recovered", "deaths"];
 
 		// will be filled later
 		this.countries = [];
@@ -145,7 +145,7 @@ class Covid19Data
 			{
 				name = countries_list[0]
 				countries_list = null;
-				// try second check (sum_countries)
+				// try second check (sum_countries) below
 			}
 			else
 				return countries_list;
@@ -172,13 +172,14 @@ class Covid19Data
 		{
 			var country = this.GetCountryByFullName(name);
 			var countries_list = country.regions.reduce( (list, region) => { list.push(region.full_name); return list; }, [] );
+			countries_list["is_sum_country"] = country;
 		}
 
 		return countries_list;
 	}
 
 
-	AppendDataByUrl(provider, data_name, data_url)
+	AppendDataByUrlAsync(provider, data_name, data_url)
 	{
 		var self = this;
 		return new Promise(function(resolve, reject)
@@ -407,9 +408,20 @@ class Covid19Data
 								{
 									// my format
 									var crd = row[key.name].split("/");
-									country.timeline[ts]["confirmed"] = crd[0]-0;
-									country.timeline[ts]["recovered"] = crd[1]-0;
-									country.timeline[ts]["deaths"] = crd[2]-0;
+									if (crd.length > 3)
+									{
+										country.timeline[ts]["tested"] = crd[0]-0;
+										country.timeline[ts]["confirmed"] = crd[1]-0;
+										country.timeline[ts]["recovered"] = crd[2]-0;
+										country.timeline[ts]["deaths"] = crd[3]-0;
+									}
+									else
+									{
+										// back compatibility
+										country.timeline[ts]["confirmed"] = crd[0]-0;
+										country.timeline[ts]["recovered"] = crd[1]-0;
+										country.timeline[ts]["deaths"] = crd[2]-0;
+									}
 								}
 								else
 									country.timeline[ts][data_name] = row[key.name]-0;
@@ -477,7 +489,7 @@ class Covid19Data
 							if (!new_country_timeline[dt])
 								new_country_timeline[dt] = {};
 							new_country_timeline[dt][key] = new_country_timeline[dt][key] || 0;
-							new_country_timeline[dt][key] += country_timeline_day[key]||0;
+							new_country_timeline[dt][key] += country_timeline_day[key] || 0;
 						}
 					}
 
@@ -500,6 +512,14 @@ class Covid19Data
 
 			var country_name = new_group.full_name.split(" / ")[0];
 			var separate_country = this.GetCountryByFullName(country_name);
+
+			// fill tested values from country (currently we don't have stat by regions)
+			if (separate_country)
+			{
+				for (var ts in new_group.timeline)
+					if (separate_country.timeline[ts])
+						new_group.timeline[ts].tested = separate_country.timeline[ts].tested;
+			}
 
 			// replace in timeline
 			for (var ts in new_group.timeline)

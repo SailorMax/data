@@ -48,6 +48,14 @@ const Covid19DataTools = {
 		return Math.max.apply(null, values);
 	},
 
+	GetMinValueFromData: function(data, val_name)
+	{
+		if (!val_name)
+			val_name = "value";
+		var values = Object.keys( data ).map( key => data[key][val_name] || 0 );
+		return Math.min.apply(null, values);
+	},
+
 	FindValueByRegression: function(func, expect_max_value, cur_day_idx, step_days)
 	{
 		var steps_limiter = 100;

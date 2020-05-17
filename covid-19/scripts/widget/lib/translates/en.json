@@ -1,0 +1,68 @@
+{
+	"CODE_COUNTRY": {
+		"Diamond Princess":				"Diamond Princess - cruise ship",
+		"Grand Princess":				"Grand Princess - cruise ship",
+		"MS Zaandam":					"MS Zaandam - cruise ship",
+		"US Military":					"US Military",
+		"Veteran Hospitals":			"Veteran Hospitals",
+		"Federal Bureau of Prisons":	"Federal Bureau of Prisons",
+
+		"World":			"World",
+		"European Union":	"European Union",
+		"Middle East":		"Middle East",
+		"US-regions":		"United States of America (regions)",
+		"Russia-regions":	"Russia (regions)",
+		"China-regions":	"China (regions)",
+		"India":			"India",
+		"other":			"other"
+	},
+
+	"WORDS": {
+		"country":			"Country",
+		"with_neighbors":	"with neighbors",
+		"delete":			"delete",
+
+		"tested":			"tested",
+		"infected":			"infected",
+		"recovered":		"recovered",
+		"deaths":			"deaths",
+		
+		"contagiosus":		"contagiosus",
+		"new_infected":		"new infected",
+		"total_infected":	"total infected",
+
+		"possible_peak":		"Possible peak",
+		"possible_finish":		"Possible end of quarantine",
+		"already_passed":		"Already passed",
+		"in_the_past":			"In the past",
+		"growth_detected":			"Growth detected!",
+		"more_action_required":		"More action required!",
+		"slowdown_is_too_small":	"Slowdown is too small!",
+		"not_soon_more_action_required":	"Not soon. More action required!",
+		"now":								"Now",
+
+		"what_are_these_charts":	"What are these charts?",
+		"footnotes":				"Footnotes",
+
+		"db_not_accessible":		"Database not accessible. Try again later."
+	},
+
+	"PREFACE_LIST": [
+		"For each region 2 graphs are displayed: daily new registered cases of infection, together with the infection rate + the overall picture of the infected for each day.",
+		"If the columns on the first graph often \"jump\" a lot, it usually means that either testing is not yet routine, or many people at the first symptoms until they see a doctor.",
+		"If the infection rate<sup><a href=\"#contagiosus\">[2]</a></sup> is equal to, for example, two, then if <u>no quarantine measures</u> are taken, we get the classic problem of \"<a href=\"https://en.wikipedia.org/wiki/Wheat_and_chessboard_problem\" target=\"_blank\">wheat on the chessboard</a>\", ie, all people on Earth are infected in 33 days, with an appropriate load of hospitals and morgue.",
+		"And if it stays below one unit (marked with an orange line) for at least 12 days<sup><a href=\"#period\">[1]</a></sup>, the region is on the mend!",
+		"Some regions, such as the \"European Union\", are displayed in coloured coloured columns, where countries with a share of more than 5% of the total growth for that day are shown in descending order.",
+		"The columns on the second chart always grow, or, if the situation improves, are kept at the same level.",
+		"At the same time, the arrow marks the dynamics of change only of infected people in 13 days. Therefore, its number may be negative.",
+		"Possible peak and quarantine completion are calculated from the current infection rate dynamics and change with it + 14 days at the end for complete recovery of the remaining patients. The event horizon is half a year."
+	],
+
+	"FOOTNOTES_LIST": [
+		"<a name=\"data_description\" class=\"footnote-number\">[0]</a> <a href=\"https://github.com/SailorMax/data\" target=\"_blank\">Data</a> taken from <a href=\"https://github.com/CSSEGISandData/COVID-19\" target=\"_blank\">the Johns Hopkins University Center for Systems Science and Engineering</a>, the <a href=\"https://coronavirus-monitor.ru\" target=\"_blank\">Коронавирус</a> website and <a href=\"https://github.com/owid/covid-19-data/tree/master/public/data\" target=\"_blank\">Our World in Data</a>.",
+		"<a name=\"period\" class=\"footnote-number\">[1]</a> <a href=\"https://ria.ru/20200322/1568965195.html\" target=\"_blank\">11.5 days</a> is the maximum time the first symptoms appear in the majority of those infected.",
+		"<a name=\"contagiosus\" class=\"footnote-number\">[2]</a> Conditional number of people that infects one patient. The arithmetic mean of the weighted number of new patients for the previous 12 days is taken and compared to the current day. The obtained figures are again averaged to the previous 12 days. For the positive dynamics, it should be less than a unit of at least 12 days.",
+		"<a name=\"recovered\" class=\"footnote-number\">[3]</a> Data on the recovered may not be available!",
+		"<a name=\"sum_country\" class=\"footnote-number\">[4]</a> The countries with the sign ∑ are the sum of the values of the lower regions. Their population &ndash; this is the sum of the population of the mentioned regions only! For this reason the population of the group may not coincide with the population of the whole country."
+	]
+}
