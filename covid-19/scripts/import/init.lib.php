@@ -122,6 +122,8 @@ class COVID19DATA
 
 	function SaveDatabase()
 	{
+		$this->ClearOldEmptyData();
+
 		$fp = fopen($this->db_path, "w");
 		if ($fp === false)
 			trigger_error("Can't open database for write!", E_USER_ERROR);
@@ -179,7 +181,7 @@ class COVID19DATA
 				$row = array($row_date, $data_type);
 				foreach ($this->regions as $region)
 				{
-					if (isset($region["timeline"][$row_date][$data_type]))
+					if (isset($region["timeline"][$row_date][$data_type]) && ($region["timeline"][$row_date][$data_type] > 0))
 					{
 						$row[] = intval($region["timeline"][$row_date][$data_type]);
 						$row_has_data = true;
@@ -412,8 +414,8 @@ class COVID19DATA
 				trigger_error("COVID-19: region not found! " . json_encode($new_region, JSON_FORCE_OBJECT), E_USER_ERROR);
 		}
 
-		if ($updated_regions)
-			$this->ClearOldEmptyData($updated_regions);
+//		if ($updated_regions)
+//			$this->ClearOldEmptyData($updated_regions);
 	}
 
 	function SetupPopulations($code_population)
@@ -444,16 +446,14 @@ class COVID19DATA
 		}
 	}
 
-	function ClearOldEmptyData($region_keys = array())
+	function ClearOldEmptyData($region_keys = null)
 	{
+		if (is_null($region_keys))
+			$region_keys = array_keys($this->regions);
+
 		foreach ($region_keys as $region_key)
 		{
 			$region =& $this->regions[$region_key];
-			if (!$region["timeline"])
-			{
-				var_dump($region_key);
-				var_dump($region);
-			}
 
 			$zero_days = array();
 			foreach ($region["timeline"] as $date => $stat_row)

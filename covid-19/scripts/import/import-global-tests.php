@@ -120,7 +120,23 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 		}
 		else
 		{
-			$new_data[ $data_key ]["timeline"][$stat_date][$values_name] = intval($region_day["total_tests"]);
+//			$new_data[ $data_key ]["timeline"][$stat_date][$values_name] = intval($region_day["total_tests"]);
+			$old_data_region = $COVID19DATA->GetRegionByName($country_name);
+			$old_data = null;
+			if (!isset($old_data_region["timeline"][$stat_date]) || ($old_data = $old_data_region["timeline"][$stat_date]))
+			{
+				foreach ($data_fields as $source_fname => $fname)
+				{
+					if (!$old_data
+						|| ($fname == "tested")	// always rewrite
+						|| (!$old_data[$fname] && ($region_day[$source_fname] > 0))	// only if empty (this source is not primary)
+						)
+					{
+						$new_data[ $data_key ]["timeline"][$stat_date][$fname] = intval($region_day[$source_fname]);
+					}
+				}
+
+			}
 		}
 	}
 };
