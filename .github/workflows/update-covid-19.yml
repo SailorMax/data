@@ -15,34 +15,33 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Setup PHP
-        run: php -i
+      - name: Setup addition packages
+        run: yes | sudo apt-get install sendmail
+
+ #     - name: Setup PHP
+ #       run: php -i
  #       uses: shivammathur/setup-php@v2
  #       with:
  #         php-version: '7.4'
  #         extensions: mbstring, intl
  #         ini-values: memory_limit=256M, short_open_tag=On
 
-      - name: Check home
-        run: |
-          pwd
-          cd /home
-          ls -lR
-#          git status
-#          git log -1
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
- #     - name: Checkout
- #       uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Run update script
-        run: php -r "mail('sailormax@live.com', 'test from actions', 'some message')"
-#        run: php -f covid-19/scripts/update_data.php ../
-          
-      - name: Commit files
+#      - name: Run update script
+#        run: php -d short_open_tag=On -f covid-19/scripts/db-import/import.php ../
+
+      - name: Check emails log
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          php -r "sleep(50);"
+          sudo tail /var/log/mail.log
+
+#      - name: Commit files
+#        run: |
+#          git config --local user.email "action@github.com"
+#          git config --local user.name "GitHub Action"
 #          git add -A
 #          git commit -m "Counting summary once a day"
 #      - name: Push changes
