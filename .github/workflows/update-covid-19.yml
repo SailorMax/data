@@ -30,18 +30,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-#      - name: Run update script
-#        run: php -d short_open_tag=On -f covid-19/scripts/db-import/import.php ../
+      - name: Run update script
+        run: php -d short_open_tag=On -f covid-19/scripts/db-import/import.php ../
 
       - name: Check emails log
         run: |
           php -r "sleep(50);"
           sudo tail /var/log/mail.log
 
-#      - name: Commit files
-#        run: |
-#          git config --local user.email "action@github.com"
-#          git config --local user.name "GitHub Action"
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git status
 #          git add -A
 #          git commit -m "Counting summary once a day"
 #      - name: Push changes
