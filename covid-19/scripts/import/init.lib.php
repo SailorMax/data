@@ -302,7 +302,7 @@ class COVID19DATA
 					// possible changed name
 					foreach ($this->new_data as $new_data_region)
 						if ((($region["country_iso"] == $new_data_region["country_iso"]) && ($region["region_iso"] == $new_data_region["region_iso"]))
-							|| (($region["lat"] && $region["lat"] == $new_data_region["lat"]) && ($region["long"] && $region["long"] == $new_data_region["long"]))
+							|| ((!empty($region["lat"]) && $region["lat"] == $new_data_region["lat"]) && (!empty($region["long"]) && $region["long"] == $new_data_region["long"]))
 							)
 						{
 							$new_data_key = $new_data_region["country_name"]."/".$new_data_region["region_name"];
