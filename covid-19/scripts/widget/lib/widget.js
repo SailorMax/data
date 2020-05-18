@@ -39,7 +39,7 @@ class Covid19Widget
 		this.calc_days_ms = this.calc_days * this.ms_in_day;
 
 		this.default_countries = [];
-		if (typeof this.config.countries != "undefined")
+		if (this.config && this.config.countries)
 			this.default_countries = this.config.countries.split(",").filter(v=>v);
 
 		this.width = 490;
