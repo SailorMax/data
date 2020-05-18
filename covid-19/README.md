@@ -13,5 +13,7 @@ Update time = 04:30 UTC
 ### Visualized data widget connect:
 ```html
 <script src="https://sailormax.github.io/data/covid-19/scripts/widget/init.js"></script>
+OR
+<script src="https://sailormax.github.io/data/covid-19/scripts/widget/init.js?lang=ru&countries=ru,auto&readonly=1&target=element_id"></script>
 ```
 [Example](https://sailormax.github.io/data/covid-19/scripts/widget.html)
