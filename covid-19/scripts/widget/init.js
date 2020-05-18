@@ -9,9 +9,11 @@
 		myPath = myUrl.protocol + "//" + myUrl.host + myUrl.pathname.replace(/\/init.js$/, "/");
 
 		// arguments:
+		// lang=ru
 		// countries=auto,RU
 		// readonly=1
 		// target=css selector without first "#"
+		config.lang = myUrl.searchParams.get("lang");
 		config.countries = myUrl.searchParams.get("countries");
 		config.readonly = myUrl.searchParams.get("readonly");
 		config.target = myUrl.searchParams.get("target");
@@ -19,6 +21,9 @@
 			config.target = "#" + config.target;
 		else
 			config.target = myScript;
+
+		if (config.lang !== "ru")
+			config.lang = "en";
 
 		// min size for scroll restore
 		if (config.target.tagName != "SCRIPT")
@@ -105,7 +110,7 @@
 						"./lib/data_tools.js",
 						// my data as cache
 						"./lib/shared_data.json",
-						"./lib/translates/ru.json",
+						"./lib/translates/"+config.lang+".json",
 					],
 					];
 

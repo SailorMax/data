@@ -53,6 +53,7 @@
 		"If the infection rate<sup><a href=\"#contagiosus\">[2]</a></sup> is equal to, for example, two, then if <u>no quarantine measures</u> are taken, we get the classic problem of \"<a href=\"https://en.wikipedia.org/wiki/Wheat_and_chessboard_problem\" target=\"_blank\">wheat on the chessboard</a>\", ie, all people on Earth are infected in 33 days, with an appropriate load of hospitals and morgue.",
 		"And if it stays below one unit (marked with an orange line) for at least 12 days<sup><a href=\"#period\">[1]</a></sup>, the region is on the mend!",
 		"Some regions, such as the \"European Union\", are displayed in coloured coloured columns, where countries with a share of more than 5% of the total growth for that day are shown in descending order.",
+		"Some countries have available data on the tests performed. If the number of tests of different days is very close to each other, these days are marked with a common color to compare detected infections.",
 		"The columns on the second chart always grow, or, if the situation improves, are kept at the same level.",
 		"At the same time, the arrow marks the dynamics of change only of infected people in 13 days. Therefore, its number may be negative.",
 		"Possible peak and quarantine completion are calculated from the current infection rate dynamics and change with it + 14 days at the end for complete recovery of the remaining patients. The event horizon is half a year."

@@ -6,21 +6,21 @@ export default
 */
 class Covid19Data
 {
-	constructor(use_last_x_days, myDirPath)
+	constructor(use_last_x_days, myPath, lang)
 	{
 		this.CODE_COUNTRY = {};
 		this.COUNTRY_GROUPS = {};
 		this.TOP_REGIONS = {};
 
 		var self = this;
-		d3.json(myDirPath+"lib/shared_data.json").then(function(data)
+		d3.json(myPath+"lib/shared_data.json", {cache:"force-cache"}).then(function(data)
 		{
 			self.COUNTRY_GROUPS = data.COUNTRY_GROUPS;
 			self.TOP_REGIONS = data.TOP_REGIONS;
 
 			Object.keys(self.TOP_REGIONS).map(k => { if (self.COUNTRY_GROUPS[ self.TOP_REGIONS[k] ]) self.TOP_REGIONS[k] = self.COUNTRY_GROUPS[ self.TOP_REGIONS[k] ]; });
 		});
-		d3.json(myDirPath+"lib/translates/ru.json").then(function(data)
+		d3.json(myPath+"lib/translates/"+lang+".json", {cache:"force-cache"}).then(function(data)
 		{
 			self.CODE_COUNTRY = data.CODE_COUNTRY;
 		});

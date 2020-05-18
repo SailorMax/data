@@ -17,11 +17,11 @@ class Covid19Widget
 		this.FOOTNOTES_LIST = {};
 
 		var self = this;
-		d3.json(myPath+"lib/shared_data.json").then(function(data)
+		d3.json(myPath+"lib/shared_data.json", {cache:"force-cache"}).then(function(data)
 		{
 			self.COUNTRY_GROUPS = data.COUNTRY_GROUPS;
 		});
-		d3.json(myPath+"lib/translates/ru.json").then(function(data)
+		d3.json(myPath+"lib/translates/"+config.lang+".json", {cache:"force-cache"}).then(function(data)
 		{
 			self.WORDS = data.WORDS;
 			self.PREFACE_LIST = data.PREFACE_LIST;
@@ -39,7 +39,7 @@ class Covid19Widget
 		this.calc_days_ms = this.calc_days * this.ms_in_day;
 
 		this.default_countries = [];
-		if (this.config && this.config.countries)
+		if (typeof this.config.countries != "undefined")
 			this.default_countries = this.config.countries.split(",").filter(v=>v);
 
 		this.width = 490;
@@ -54,10 +54,10 @@ class Covid19Widget
 		this.colors = ["#1f78b4","#fb9a99","#cab2d6","#6a3d9a","#b15928","#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#b2df8a","#666666", "#a6cee3", "#17becf", "#bcbd22", "#e377c2","#999999"];
 		this.top_infected_percent_limit = 5;
 
-		this.data = new Covid19Data(this.week_size*2, myPath);
+		this.data = new Covid19Data(this.week_size*2, myPath, this.config.lang);
 
 		this.PrepareTooltips();
-		this.LoadDataAsync().then( ()=>self.InitFirstForm() );
+		this.LoadDataAsync(myPath).then( ()=>self.InitFirstForm() );
 	}
 
 	PrepareTooltips()
@@ -103,14 +103,20 @@ class Covid19Widget
 		// https://github.com/ulklc/covid19-timeseries/blob/master/report/raw/rawReport.csv
 		// https://coronadatascraper.com/
 
-		var data_source_prefix = "https://raw.githubusercontent.com/SailorMax/data/master/";
-		return this.data.AppendDataByUrlAsync("my_merged",
-												{
-													"merged":			data_source_prefix+"covid-19/31days_covid19_merged_global.csv",
-													"country_borders":	data_source_prefix+"geo/country_borders.csv",
-													"country_names":	data_source_prefix+"geo/translates/countries/ru.csv",
-													"region_names":		data_source_prefix+"geo/translates/regions/ru.csv",
-												});
+//		var data_source_prefix = "/direct/js/";
+		var data_source_prefix = "https://sailormax.github.io/data/";
+
+		var sources = {
+				"merged":			data_source_prefix+"covid-19/31days_covid19_merged_global.csv",
+				"country_borders":	data_source_prefix+"geo/country_borders.csv",
+				};
+		if (this.config.lang != "en")
+		{
+			sources["country_names"]	= data_source_prefix+"geo/translates/countries/"+this.config.lang+".csv";
+			sources["region_names"]		= data_source_prefix+"geo/translates/regions/"+this.config.lang+".csv";
+		}
+
+		return this.data.AppendDataByUrlAsync("my_merged", sources);
 	}
 
 	InitFirstForm()
