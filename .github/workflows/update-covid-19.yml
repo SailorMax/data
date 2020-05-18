@@ -4,7 +4,7 @@ name: Update COVID-19 data
 # events but only for the master branch OR schedule cron
 on:
   schedule:
-  - cron: '30 9 * * *'
+  - cron: '45 9 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run update script
-        run: php -d short_open_tag=On -d error_reporting="E_ALL & ~E_NOTICE" -f covid-19/scripts/import/import.php ../
+        run: php -d short_open_tag=On -d error_reporting="E_ALL & ~E_NOTICE" -f covid-19/scripts/import/import.php ../../
 
       - name: Check emails log
         run: |
@@ -43,9 +43,10 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git status
-#          git add -A
-#          git commit -m "Counting summary once a day"
-#      - name: Push changes
-#        uses: ad-m/github-push-action@master
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git add -A
+          git commit -m "covid-19 / refresh database"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
