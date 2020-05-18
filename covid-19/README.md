@@ -12,6 +12,6 @@ Update time = 04:30 UTC
 
 ### Visualized data widget connect:
 ```html
-<script src="https://raw.githubusercontent.com/SailorMax/data/master/covid-19/scripts/widget/init.js"></script>
+<script src="https://sailormax.github.io/data/covid-19/scripts/widget/init.js"></script>
 ```
-[Example](https://raw.githubusercontent.com/SailorMax/data/master/covid-19/scripts/widget.html)
+[Example](https://sailormax.github.io/data/covid-19/scripts/widget.html)
