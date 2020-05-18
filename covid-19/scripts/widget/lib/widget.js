@@ -8,7 +8,7 @@ export
 */
 class Covid19Widget
 {
-	constructor(config, myDirPath)
+	constructor(config, myPath)
 	{
 		this.COUNTRY_BORDERS = {};	// fills later
 		this.WORDS = {};
@@ -17,11 +17,11 @@ class Covid19Widget
 		this.FOOTNOTES_LIST = {};
 
 		var self = this;
-		d3.json(myDirPath+"lib/shared_data.json").then(function(data)
+		d3.json(myPath+"lib/shared_data.json").then(function(data)
 		{
 			self.COUNTRY_GROUPS = data.COUNTRY_GROUPS;
 		});
-		d3.json(myDirPath+"lib/translates/ru.json").then(function(data)
+		d3.json(myPath+"lib/translates/ru.json").then(function(data)
 		{
 			self.WORDS = data.WORDS;
 			self.PREFACE_LIST = data.PREFACE_LIST;
@@ -54,7 +54,7 @@ class Covid19Widget
 		this.colors = ["#1f78b4","#fb9a99","#cab2d6","#6a3d9a","#b15928","#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#b2df8a","#666666", "#a6cee3", "#17becf", "#bcbd22", "#e377c2","#999999"];
 		this.top_infected_percent_limit = 5;
 
-		this.data = new Covid19Data(this.week_size*2, myDirPath);
+		this.data = new Covid19Data(this.week_size*2, myPath);
 
 		this.PrepareTooltips();
 		this.LoadDataAsync().then( ()=>self.InitFirstForm() );

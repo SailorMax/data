@@ -2,11 +2,11 @@
 {
 	let myScript = document.currentScript;
 	let config = {};
-	let myDirPath = null;
+	let myPath = null;
 	if (myScript && myScript.src)
 	{
 		let myUrl = new URL(myScript.src);
-		myDirPath = myUrl.pathname.replace(/\/init.js$/, "/");
+		myPath = myUrl.protocol + "//" + myUrl.host + myUrl.pathname.replace(/\/init.js$/, "/");
 
 		// arguments:
 		// countries=auto,RU
@@ -54,7 +54,7 @@
 		let style_link = document.createElement("LINK");
 		style_link.rel = "stylesheet";
 		style_link.type = "text/css";
-		style_link.href = myDirPath + "lib/styles.css";
+		style_link.href = myPath + "lib/styles.css";
 		document.head.appendChild( style_link );
 
 /*
@@ -65,7 +65,7 @@
 				var Covid19Widget = module.Covid19Widget;
 */
 				// start
-				new Covid19Widget(config, myDirPath);
+				new Covid19Widget(config, myPath);
 /*
 			}
 		).catch(err => console.error(err.message) );
@@ -132,13 +132,13 @@
 		{
 			if (module_name.substr(-5) == ".json")
 			{
-				fetch( new Request(myDirPath + module_name.substr(2)) ).then( onLoad );
+				fetch( new Request(myPath + module_name.substr(2)) ).then( onLoad );
 			}
 			else if (module_name.substr(0, 2) == "./")
 			{
 //				import(module_name).then(onLoad);
 				let script = document.createElement("SCRIPT");
-				script.src = myDirPath + module_name.substr(2);
+				script.src = myPath + module_name.substr(2);
 				script.addEventListener("load", onLoad);
 				document.head.appendChild( script );
 			}
