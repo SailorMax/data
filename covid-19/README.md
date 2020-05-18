@@ -10,7 +10,8 @@ Update time = 04:30 UTC
 | time_series_covid19_tested_global.csv        | -//- |
 
 
-Visualized data
-<div style="width:1000px;">
-	<script src="https://raw.githubusercontent.com/SailorMax/data/master/covid-19/scripts/widget/init.js"></script>
-</div>
+### Visualized data widget connect:
+```html
+<script src="https://raw.githubusercontent.com/SailorMax/data/master/covid-19/scripts/widget/init.js"></script>
+```
+[Example](https://raw.githubusercontent.com/SailorMax/data/master/covid-19/scripts/widget.html)
