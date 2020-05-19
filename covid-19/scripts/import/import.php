@@ -18,5 +18,5 @@ include "setup-attrs.php";
 
 $COVID19DATA->SaveDatabase();
 
-//include "export.php";
+include "export.php";
 ?>
