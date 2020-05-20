@@ -544,7 +544,7 @@ class Covid19Widget
 			.attr("font-family", "sans-serif")
 			.attr("font-size", 11)
 			.attr("fill", "red")
-			.attr("x", this.width - 65)
+			.attr("x", this.width - 70)
 			.attr("y", 10)
 			.text(this.WORDS["contagiosus"]+"**");
 

@@ -17,3 +17,5 @@ OR
 <script src="https://sailormax.github.io/data/covid-19/scripts/widget/init.js?lang=ru&countries=ru,auto&readonly=1&target=element_id"></script>
 ```
 [Example](https://sailormax.github.io/data/covid-19/scripts/widget.html)
+
+[Пример моей странички](https://covid-19.sailormax.net/)
