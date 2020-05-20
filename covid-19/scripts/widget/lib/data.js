@@ -378,7 +378,7 @@ class Covid19Data
 							if (!this.min_ts)
 							{
 								var max_date = Object.keys(row).reduce( (max, key) => { var dt = (new Date(key))-0; return (dt && dt > max ? dt : max); }, 0 );
-								this.min_ts = (new Date(max_date - (this.use_last_x_days*this.ms_in_day)))-0;
+								this.min_ts = (new Date(max_date - (this.use_last_x_days*this.ms_in_day)))-this.ms_in_day;	// minus 1 day for better calculate first day changes
 							}
 
 							// collect require_cols to minimize date recognitions
