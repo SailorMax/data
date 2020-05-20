@@ -94,6 +94,7 @@ class Covid19Data
 			changes.push( day_changes );
 			prev_day = day;
 		}
+		changes.shift();	// remove first element, because it has not changes
 		return changes;
 	}
 
@@ -104,7 +105,7 @@ class Covid19Data
 		return daily_infection.map(
 				function(el, idx)
 				{
-					var diff = 0;	// first day
+					var diff = 1;	// first day
 					if (idx > 0 && moving_average_data[idx-1].value > 0)
 						diff = Math.round((el[fname] / moving_average_data[idx-1].value) * 10) / 10;
 					if (diff < 0)
