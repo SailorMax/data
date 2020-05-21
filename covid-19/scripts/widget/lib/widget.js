@@ -382,6 +382,8 @@ class Covid19Widget
 
 			// display dots
 			var colors = ["#b138cb55", "#604dac55", "#99660055"];
+			if (nearests.length > colors.length)
+				nearests.splice(colors.length);
 			var i, cnt = nearests.length;
 			for (i=0; i<cnt; i++)
 			{
