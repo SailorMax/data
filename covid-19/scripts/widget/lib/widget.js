@@ -129,7 +129,7 @@ class Covid19Widget
 
 		this.data.ApplyCountrySumGroups();
 
-		this.min_date = new Date(this.data.min_ts + this.week_size_ms);
+		//this.min_date = new Date(this.data.min_ts + this.week_size_ms); // better use max_tx-week_size, but currently we don't have max_ts + it can be wrong
 
 		// fill country select
 //		var d3_base_form = d3.select("#stat_block FORM:first-child");
@@ -725,7 +725,7 @@ class Covid19Widget
 		box["myRegressionMethod"] = regression_method;
 		var contag_func = regression_method.func;
 		var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
-		xy_list =  xy_list.slice(contag_data.length-1);		// work only with latest data
+		xy_list =  xy_list.slice(xy_list.length-contag_data.length);		// work only with latest data
 		if (contag_func)
 		{
 			var new_xy_list = xy_list.map( (d,idx) => [ idx, contag_func(d[0]-idx_shift) ] );
