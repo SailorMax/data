@@ -76,9 +76,9 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 											"timeline"		=> array()
 											);
 
-//			if (isset($new_data[ $data_key ]["timeline"][$stat_date][$values_name]))
-//				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] += intval($region[$date]);
-//			else
+			if (isset($new_data[ $data_key ]["timeline"][$stat_date][$values_name]))
+				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] += intval($region[$date]);	// sum, because source has splitted data by cities
+			else
 				$new_data[ $data_key ]["timeline"][$stat_date][$values_name] = intval($region[$date]);
 		}
 };
