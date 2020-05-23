@@ -129,7 +129,7 @@ class Covid19Widget
 
 		this.data.ApplyCountrySumGroups();
 
-		//this.min_date = new Date(this.data.min_ts + this.week_size_ms); // better use max_tx-week_size, but currently we don't have max_ts + it can be wrong
+		this.min_date = new Date(this.data.max_ts - this.week_size_ms); // better use max_tx-week_size, but currently we don't have max_ts + it can be wrong
 
 		// fill country select
 //		var d3_base_form = d3.select("#stat_block FORM:first-child");
