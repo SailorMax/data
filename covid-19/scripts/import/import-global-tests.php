@@ -48,10 +48,16 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 		if ($stat_ts >= $today_ts)
 			continue;
 
+		$country_name = $region_day["location"];
+
 		$country_iso = null;
 		$country_iso3 = $region_day["iso_code"];
+		$country_key = $country_name.":".$country_iso3;
+
 		if (isset($REGION_CODE3[$country_iso3]))
 			$country_iso = $REGION_CODE3[$country_iso3];
+		else if (isset($CONVERT_CODES[$country_key]))
+			$country_iso = $CONVERT_CODES[$country_key]["country_iso"];
 		else
 		{
 			trigger_error("Can't convert country code '$country_iso3'!", E_USER_WARNING);
@@ -61,7 +67,6 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 		$as_new_country = false;
 		$region_name = null;
 		$region_iso = null;
-		$country_name = $region_day["location"];
 		$country_key = $country_name.":".$country_iso;
 
 		if (isset($CONVERT_CODES[$country_key]))
