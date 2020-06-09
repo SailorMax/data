@@ -4,7 +4,7 @@ name: Update COVID-19 data
 # events but only for the master branch OR schedule cron
 on:
   schedule:
-  - cron: '30 4,9 * * *'
+  - cron: '30 4,9,12 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -41,7 +41,7 @@ jobs:
           sudo tail /var/log/mail.log
 
       - name: Commit files
-#        if: env.GIT_CHANGED_FILES == ''
+        if: env.GIT_CHANGED_FILES != ''
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -50,7 +50,7 @@ jobs:
           git commit -m "covid-19 / refresh database"
 
       - name: Push changes
-#        if: env.GIT_CHANGED_FILES == ''
+        if: env.GIT_CHANGED_FILES != ''
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
