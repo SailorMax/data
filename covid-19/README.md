@@ -1,4 +1,4 @@
-Update time = 04:30 UTC
+Update time = 02:30, 05:30, 08:30, 11:30 UTC
 
 | files                    | description    |
 | ------------------------ | -------------- |
