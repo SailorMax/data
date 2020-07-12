@@ -94,7 +94,7 @@
 	font-size: 0.9em;
 }
 .Cv19SMW .svg TABLE.analytic_data TR:nth-child(odd) TD { background-color: #f1f1f1; }
-.Cv19SMW .svg TABLE.analytic_data TD:nth-child(2) { width: 10%; }
+.Cv19SMW .svg TABLE.analytic_data TD:nth-child(2) { width: 10mm; }
 .Cv19SMW .svg TABLE.analytic_data TD { padding: 0 1mm; }
 
 .Cv19SMW .svg TABLE.analytic_data .infected_per_period INPUT { width: 10mm; margin: 0 1mm; }
