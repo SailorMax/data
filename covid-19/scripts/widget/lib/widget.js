@@ -728,7 +728,9 @@ class Covid19Widget
 		var prev_date = null;
 		d3_svg.append("g")
 			.attr("transform", "translate(0,"+(this.height - this.margin.bottom)+")")
-			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ));
+			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ))
+			.selectAll("text")
+				.attr("font-style", dt => ((dt.getDay() || 7) > 5 ? "italic" : "normal"));
 
 		var max_new_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
 //			var max_new_recovered = Covid19DataTools.GetMaxValueFromData(country_data, "recovered");
@@ -1085,7 +1087,9 @@ class Covid19Widget
 		var x_scale = d3.scaleBand(this.data.GetDaysListFromData(country_data), [this.margin.left, this.width - this.margin.left]).paddingInner(0.5).paddingOuter(0.5);
 		d3_svg.append("g")
 			.attr("transform", "translate(0,"+(this.height - this.margin.bottom)+")")
-			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ));
+			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ))
+			.selectAll("text")
+				.attr("font-style", dt => ((dt.getDay() || 7) > 5 ? "italic" : "normal"));
 
 		var max_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
 		var has_infections = max_confirmed > 0;
