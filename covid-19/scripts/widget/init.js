@@ -87,6 +87,7 @@
 						"d3-dsv.v1",
 						"d3-format.v1",
 						"d3-time-format.v2",
+						"d3-ease.v1",
 					],
 					// with relations
 					[
@@ -99,7 +100,6 @@
 						"d3-path.v1",
 
 						"d3-timer.v1",
-						"d3-ease.v1",
 						"d3-color.v1",
 						"d3-transition.v1",
 

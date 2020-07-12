@@ -954,8 +954,9 @@ class Covid19Widget
 
 		// regression
 		var xy_list = box["myContagData"].map((d,idx) => [idx, d.value]);
-		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, contag_data.length);
-		box["myRegressionMethod"] = regression_method;
+//		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, contag_data.length);
+//		box["myRegressionMethod"] = regression_method;
+		var regression_method = box["myRegressionMethod"];
 		var contag_func = regression_method.func;
 		var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
 		xy_list =  xy_list.slice(xy_list.length-contag_data.length);		// work only with latest data
@@ -1335,7 +1336,7 @@ class Covid19Widget
 
 	ShowTheCountryStat(country_name, sender_box)
 	{
-		var country_node_finder = el => (el.value == country_name) && !d3.select(el.parentNode).select("INPUT[name='with_neighbors']").property("checked");
+		var country_node_finder = el => (el.value == country_name) && !d3.select(el.parentNode.parentNode).select("INPUT[name='with_neighbors']").property("checked");
 
 		// find or create new
 //		var country_select = d3.selectAll("#stat_block FORM SELECT").nodes().find( country_node_finder );
