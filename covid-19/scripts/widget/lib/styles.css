@@ -1,8 +1,9 @@
+.Cv19SMW:after { display:block; clear:left; content:""; }
 .Cv19SMW SUP { font-size:0.6em; padding-left:2px; }
 .Cv19SMW SUP A { text-decoration: none; }
 .Cv19SMW .preface { padding-bottom:5mm; }
 .Cv19SMW .preface UL { margin-bottom: 0; }
-.Cv19SMW .footnotes { border-top:1px solid #f0f0f0; margin: 5mm 0 0 0; padding-top:1mm; }
+.Cv19SMW .footnotes { clear:left; border-top:1px solid #f0f0f0; margin: 5mm 0 0 0; padding-top:1mm; }
 .Cv19SMW .preface A:hover,
 .Cv19SMW .footnotes A:hover { cursor:pointer; text-decoration:underline; }
 
@@ -17,11 +18,54 @@
 
 .Cv19SMW .footnotes UL { padding:0 0 0 20px; line-height: 1.4em; list-style: none; }
 .Cv19SMW .footnote-number { color: black; margin-left:-20px; }
-.Cv19SMW FORM { clear:left; }
+.Cv19SMW FORM
+{
+	clear: left;
+	float: left;
+/*	border-bottom: 1px solid #e1e1e1;*/
+	padding-left: 1mm;
+	margin-bottom: 2mm;
+
+	background: transparent;
+	background: linear-gradient(180deg, #e1e1e1ff 0%, #e1e1e130 30%, #e1e1e100 100%);
+}
 .Cv19SMW FORM:after { display:block; clear:left; content:""; }
-.Cv19SMW .remove-btn { float:right; margin-right:10px; visibility:hidden; }
+.Cv19SMW FORM P SELECT.country { width: 350px; }
+.Cv19SMW .remove-btn { margin-left: 5px; margin-right:10px; visibility:hidden; }
 .Cv19SMW FORM LABEL.option { display:inline-block; visibility:hidden; white-space:nowrap; line-height:0.9em; }
 .Cv19SMW FORM LABEL.option INPUT { float:left; margin: 0 3px; }
+
+.Cv19SMW .tabs { padding-bottom: 1mm; }
+.Cv19SMW .tabs TABLE { table-layout: fixed; border-spacing:0; }
+.Cv19SMW .tabs TABLE TD
+{
+	width: 33%;
+	text-align: center;
+	padding: 0;
+}
+.Cv19SMW .tabs TABLE TD A
+{
+	display: block;
+	padding: 1mm;
+	color: black;
+	cursor: pointer;
+	border-bottom: 1px solid black;
+}
+.Cv19SMW .tabs TABLE TD.active A
+{
+	border: 1px solid black;
+	border-bottom: 1px solid transparent;
+	border-radius: 1mm 1mm 0 0;
+	background-color: white;
+}
+.Cv19SMW .tabs TABLE TD A:hover
+{
+	background-color: white;
+	border-bottom: 1px solid #f1f1f1;
+	border-radius: 1mm 1mm 0 0;
+
+}
+
 .Cv19SMW .svg { float:left; margin-right: 20px; margin-bottom: 10px; }
 .Cv19SMW .svg:last-child { margin-right:0; }
 .Cv19SMW .svg UL.legend
@@ -44,6 +88,17 @@
 }
 .Cv19SMW .svg TABLE.legend TD { text-align:center; }
 .Cv19SMW .svg TABLE.legend TH:first-child { width:190px; }
+
+.Cv19SMW .svg TABLE.analytic_data
+{
+	font-size: 0.9em;
+}
+.Cv19SMW .svg TABLE.analytic_data TR:nth-child(odd) TD { background-color: #f1f1f1; }
+.Cv19SMW .svg TABLE.analytic_data TD:nth-child(2) { width: 10%; }
+.Cv19SMW .svg TABLE.analytic_data TD { padding: 0 1mm; }
+
+.Cv19SMW .svg TABLE.analytic_data .infected_per_period INPUT { width: 10mm; margin: 0 1mm; }
+.Cv19SMW .svg TABLE.analytic_data .infected_per_x INPUT { width: 20mm; margin: 0 1mm; }
 
 /* from: https://www.w3schools.com/css/css_tooltip.asp */
 .Cv19SMWtooltiptext {

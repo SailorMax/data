@@ -126,6 +126,17 @@ class Covid19Data
 		return Object.keys( data ).map( key => data[key].date );
 	}
 
+	GetAllCountryNames()
+	{
+		var all_countries = [];
+		for (var country of this.countries)
+		{
+			if (country.code.length == 2 && country.region === null)
+				all_countries.push(country.name);
+		}
+		return all_countries;
+	}
+
 	GetCountriesByGroupName(name, include_sum_countries, with_neighbors)
 	{
 		var countries_list = null;

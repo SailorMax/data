@@ -22,6 +22,10 @@
 		"with_neighbors":	"с соседями",
 		"delete":			"удалить",
 
+		"analytics":		"Аналитика",
+		"statistic":		"Статистика",
+		"results":			"Результаты",
+
 		"tested":			"протестированы",
 		"infected":			"инфицированы",
 		"recovered":		"выздоровели",
@@ -31,15 +35,25 @@
 		"new_infected":		"новые заразившиеся",
 		"total_infected":	"всего заразившихся",
 
+		"infected_per_period":	"Количество новых заболевших за последние",
+		"days":					"дней",
+		"infected_per_x":		"Количество новых заболевших на",
+		"of_persons":			"человек",
+		"figure_of_change":		"Фигура изменения",
+		"line":					"прямая",
+		"parabola":				"парабола",
+		"contag_koef":			"Коэффициент заразности",
+
 		"possible_peak":		"Предположительный пик",
 		"possible_finish":		"Возможное завершение карантина",
-		"already_passed":		"Уже пройден.",
+		"already_passed":		"Пройден.",
 		"in_the_past":			"В прошлом.",
 		"growth_detected":			"Обнаружен рост!",
 		"more_action_required":		"Требуется больше мер!",
 		"slowdown_is_too_small":	"Замедление слишком малое!",
 		"not_soon_more_action_required":	"Не скоро. Требуется больше мер!",
 		"now":								"Сейчас.",
+		"almost_done":				"Уже Почти. Следуйте рекомендациям!",
 
 		"what_are_these_charts":	"Что можно узнать по этим графикам?",
 		"footnotes":				"Сноски",

@@ -186,7 +186,7 @@ class Covid19Widget
 			if (country.substr)
 				this.AddNewCountry(country);
 			else
-				this.AddNewCountry(country.name, country.with_neighbors);
+				this.AddNewCountry(country.name, country.with_neighbors, country.active_tab_nr);
 		});
 
 		// restore min-height to reduce when user remove country
@@ -223,12 +223,6 @@ class Covid19Widget
 			let d3_forms_box = d3.create("DIV").attr("class", "charts_list");
 			d3_forms_box.append("FORM")
 							.on("submit", ()=>false)
-						.append("INPUT")
-							.property("type", "button")
-							.property("value", this.WORDS["delete"])
-							.attr("class", "remove-btn")
-							.style("display", ()=>self.config.readonly?"none":"inline-block")
-						.select(function(){ return this.parentNode; })
 						.append("P")
 							.text(this.WORDS["country"])
 							.append("SUP")
@@ -237,10 +231,16 @@ class Covid19Widget
 								.call( (d3_sel) => d3_sel.node().appendChild( document.createTextNode("[4]") ) )
 						.select(function(){ return this.parentNode.parentNode; })
 							.call( (d3_sel) => d3_sel.node().appendChild( document.createTextNode(": ") ) )
-							.append("SELECT")
+							.append("SELECT").attr("class", "country")
 							.attr("disabled", ()=>self.config.readonly)
 							.select(function(){ return this.parentNode })
-							.call( (d3_sel) => d3_sel.node().appendChild( document.createTextNode(" ") ) )
+						.append("INPUT")
+							.property("type", "button")
+							.property("value", this.WORDS["delete"])
+							.attr("class", "remove-btn")
+							.style("display", ()=>self.config.readonly?"none":"inline-block")
+						.select(function(){ return this.parentNode.parentNode; })
+						.append("P")
 							.append("LABEL")
 								.attr("class", "option")
 								.append("INPUT")
@@ -421,6 +421,238 @@ class Covid19Widget
 
 	}
 
+	GetInfectedCountPer(daily_changes, days, scale, population)
+	{
+		var days_data = daily_changes.slice(-days);
+		var confirmed = days_data.reduce((sum, el) => sum+el.confirmed, 0);
+		if (scale && (population > 0))
+		{
+			var population_percent = confirmed / population;	// TODO: population - country confirmed?
+			confirmed = Math.ceil(scale * population_percent);
+		}
+		return confirmed;
+	}
+
+	GetPredictionValues(contag_data, regression_method, daily_changes, population)
+	{
+		var infected_level = this.GetInfectedCountPer(daily_changes, this.calc_days, 100000, population);
+		if (infected_level > 0 && infected_level < 21)	// Is it good value?
+		{
+			return [this.WORDS["already_passed"], this.WORDS["almost_done"]];
+		}
+
+		var values = [this.WORDS["already_passed"], this.WORDS["in_the_past"]];
+
+		// based on contag
+		var full_recovery_days = 14;		// 2 weeks
+		var full_recovery_ms = full_recovery_days * this.ms_in_day;
+
+		var last_value_diff = regression_method.func( regression_method.last_learn_day_id ) - regression_method.func( regression_method.last_learn_day_id - 1 );
+		if (last_value_diff > 0)
+		{
+			values = [this.WORDS["growth_detected"], this.WORDS["more_action_required"]];
+		}
+		else if (regression_method.invert_func)
+		{
+			var peak_day_idx = Math.ceil( regression_method.invert_func(1) );	// When we will have Contag = 1?
+			var end_day_idx = Math.ceil( regression_method.invert_func(0) );	// When we will have Contag = 0?
+
+			var zero_day_ms = contag_data[contag_data.length-this.calc_days-1].date-0;
+			var peak_day = new Date(zero_day_ms + peak_day_idx*this.ms_in_day);
+			var end_day = new Date(zero_day_ms + end_day_idx*this.ms_in_day + full_recovery_ms);
+
+			if (isFinite(peak_day_idx) && (peak_day_idx > this.calc_days+1))
+			{
+				if (peak_day_idx > 180)	// +half year
+					values[0] = this.WORDS["slowdown_is_too_small"];
+				else
+					values[0] = Covid19DataTools.formatDate(peak_day);
+			}
+
+			if (isFinite(end_day_idx) && (end_day_idx > this.calc_days + 1 - full_recovery_days))
+			{
+				if (end_day_idx > 180)	// +half year
+					values[1] = this.WORDS["not_soon_more_action_required"];
+				else
+					values[1] = Covid19DataTools.formatDate(end_day);
+			}
+		}
+		else // search step by step
+		{
+			var start_day_ms = contag_data[ contag_data.length-1 ].date-0;
+			var cur_day_idx = regression_method.last_learn_day_id;
+			var start_day_idx = cur_day_idx;
+
+			var curr_contag = regression_method.func(cur_day_idx);
+			if (curr_contag == 1)
+				values[0] = this.WORDS["now"];
+			else if (curr_contag > 1)
+			{
+				// search peakcur_day_idx
+				var peak_idx = Covid19DataTools.FindValueByRegression(regression_method.func, 1, cur_day_idx, this.calc_days);
+				if (peak_idx !== null)
+				{
+					values[0] = Covid19DataTools.formatDate(new Date(start_day_ms + (peak_idx - start_day_idx)*this.ms_in_day) );
+					cur_day_idx = peak_idx;	// let continue search the finish
+				}
+				else
+					values[0] = this.WORDS["slowdown_is_too_small"];
+			}
+
+			var curr_contag = regression_method.func(cur_day_idx);
+			if (curr_contag >= 0.05)
+			{
+				// search finish
+				var finish_idx = Covid19DataTools.FindValueByRegression(regression_method.func, 0, cur_day_idx, this.calc_days);
+				if (finish_idx !== null)
+				{
+					values[1] = Covid19DataTools.formatDate(new Date(start_day_ms + (finish_idx - start_day_idx)*this.ms_in_day + full_recovery_ms) );	// + calc_days_ms - for full recovery
+				}
+				else
+					values[1] = this.WORDS["not_soon_more_action_required"];
+			}
+		}
+		return values;
+	}
+
+	ShowAnalytic(box, country_name, with_neighbors)
+	{
+		var self = this;
+		var population = 0;
+		var chart_country_name = country_name;
+		var countries_list = this.data.GetCountriesByGroupName(country_name, true, with_neighbors);
+		if (!countries_list)
+		{
+			var country_timeline = this.data.GetTimelineByCountryName(country_name);
+			population = this.data.GetPopulationByCountryName(country_name);
+
+			var daily_changes = this.data.GetChangesByDateData(country_timeline);
+		}
+		else // global data
+		{
+			var countries_timeline = null;
+			if (countries_list.length)
+				countries_timeline = this.data.GetTimelineByCountryName(countries_list);
+			else // Wolrd
+			{
+				countries_timeline = this.data.GetTimelineWithoutCountryDuplicates();
+				countries_list = this.data.GetAllCountryNames();
+			}
+
+			var daily_changes = this.data.GetChangesByDateData(countries_timeline, true);
+
+
+			countries_list.map(function(country_name)
+			{
+				var country_population = self.data.GetPopulationByCountryName(country_name);
+				if (country_population)
+					population += country_population;
+			});
+			if (!population)
+				population = this.data.GetPopulationByCountryName(country_name);
+		}
+
+		// create detached element
+		var d3_box = d3.create("div")
+						.attr("class", "svg");
+		var d3_table = d3_box.append("table")
+						.attr("class", "analytic_data")
+						.attr("width", this.width)
+						.attr("height", this.height);
+
+		var funcRecalculateValues = function()
+		{
+			var calc_days = d3_box.select(".infected_per_period TD INPUT").property("value");
+			var scale = d3_box.select(".infected_per_x TD INPUT").property("value");
+
+			var infected_per_period = self.GetInfectedCountPer(daily_changes, calc_days);
+			d3_box.select(".infected_per_period TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_period, true) );
+			var infected_per_x = self.GetInfectedCountPer(daily_changes, calc_days, scale, population);
+			d3_box.select(".infected_per_x TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_x, true) );
+
+			box["myCalcDays"] = calc_days;
+			box["myScale"] = scale;
+		};
+
+		var calc_days = this.calc_days;
+		if (box["myCalcDays"] !== undefined)
+			calc_days = box["myCalcDays"];
+		var scale = 100000;
+		if (box["myScale"] !== undefined)
+			scale = box["myScale"];
+
+		// infected
+		d3_table.append("tr").attr("class", "infected_per_period")
+			.append("td")
+				.append("span").text(this.WORDS["infected_per_period"])
+				.select(function(){ return this.parentNode; })
+				.append("input").attr("type", "number").attr("min", "1").attr("max", daily_changes.length).attr("value", calc_days).on("input", funcRecalculateValues)
+				.select(function(){ return this.parentNode; })
+				.append("span").text(this.WORDS["days"])
+			.select(function(){ return this.parentNode.parentNode; })
+			.append("td");
+
+		// per 100,000
+		d3_table.append("tr").attr("class", "infected_per_x")
+			.append("td").append("span").text(this.WORDS["infected_per_x"])
+				.select(function(){ return this.parentNode; })
+				.append("input").attr("type", "number").attr("min", "0").attr("value", scale).on("input", funcRecalculateValues)
+				.select(function(){ return this.parentNode; })
+				.append("span").text(this.WORDS["of_persons"])
+			.select(function(){ return this.parentNode.parentNode; })
+			.append("td");
+
+
+		// figure
+		var contag_data = this.data.GetContagiosusByDateData(daily_changes, "confirmed", this.calc_days);
+		contag_data = Covid19DataTools.GetSimpleMovingWeightedAverage(contag_data, "value", this.calc_days, 2);
+		// store box general values
+		box["myContagData"] = contag_data;
+		contag_data = this.data.GetDataByMinDate( contag_data, this.min_date );
+
+		var xy_list = box["myContagData"].map((d,idx) => [idx, d.value]);
+		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, contag_data.length);
+		box["myRegressionMethod"] = regression_method;
+		d3_table.append("tr").attr("class", "change_figure")
+			.append("td")
+				.text(this.WORDS["figure_of_change"])
+			.select(function(){ return this.parentNode; })
+			.append("td")
+				.text(this.WORDS[regression_method.name]);
+
+		// contag
+		d3_table.append("tr").attr("class", "contag_koef")
+			.append("td")
+				.text(this.WORDS["contag_koef"])
+			.select(function(){ return this.parentNode; })
+			.append("td")
+				.text(contag_data[contag_data.length-1].value);
+
+
+		// predictions
+		var predictions = this.GetPredictionValues(box["myContagData"], box["myRegressionMethod"], daily_changes, population);
+
+		// peak
+		d3_table.append("tr").attr("class", "possible_peak")
+			.append("td")
+				.text(this.WORDS["possible_peak"])
+			.select(function(){ return this.parentNode; })
+			.append("td")
+				.text(predictions[0]);
+
+		// finish
+		d3_table.append("tr").attr("class", "possible_finish")
+			.append("td")
+				.text(this.WORDS["possible_finish"])
+			.select(function(){ return this.parentNode; })
+			.append("td")
+				.text(predictions[1]);
+
+		// attach element to DOM
+		d3.select(box).append( () => d3_box.node() );
+		funcRecalculateValues();
+	}
+
 	ShowContagiosus(box, country_name, with_neighbors)
 	{
 		var chart_country_name = country_name;
@@ -475,12 +707,14 @@ class Covid19Widget
 				day.top_countries = top_countries;
 			}
 		}
-
+/*
 		var contag_data = this.data.GetContagiosusByDateData(daily_changes, "confirmed", this.calc_days);
 		contag_data = Covid19DataTools.GetSimpleMovingWeightedAverage(contag_data, "value", this.calc_days, 2);
 		// store box general values
 		box["myContagData"] = contag_data;
 		contag_data = this.data.GetDataByMinDate( contag_data, this.min_date );
+*/
+		var contag_data = this.data.GetDataByMinDate( box["myContagData"], this.min_date );
 
 		// create detached element
 		var d3_box = d3.create("div")
@@ -721,7 +955,6 @@ class Covid19Widget
 		// regression
 		var xy_list = box["myContagData"].map((d,idx) => [idx, d.value]);
 		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, contag_data.length);
-		console.log({country:chart_country_name, regression:regression_method.name});
 		box["myRegressionMethod"] = regression_method;
 		var contag_func = regression_method.func;
 		var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
@@ -1001,105 +1234,51 @@ class Covid19Widget
 						.attr("font-size", 12)
 						.text(label.text);
 			});
-
-
-			// predictions
-			var labels = [this.WORDS["possible_peak"], this.WORDS["possible_finish"]];
-			var values = [this.WORDS["already_passed"], this.WORDS["in_the_past"]];
-
-			// calculate
-			var contag_data = box["myContagData"];
-//				var cumm_values = box["myCummulativeValues"];
-			var regression_method = box["myRegressionMethod"];
-
-			// based on contag
-			var full_recovery_days = 14;		// 2 weeks
-			var full_recovery_ms = full_recovery_days * this.ms_in_day;
-
-			var last_value_diff = regression_method.func( regression_method.last_learn_day_id ) - regression_method.func( regression_method.last_learn_day_id - 1 );
-			if (last_value_diff > 0)
-			{
-				values = [this.WORDS["growth_detected"], this.WORDS["more_action_required"]];
-			}
-			else if (regression_method.invert_func)
-			{
-				var peak_day_idx = Math.ceil( regression_method.invert_func(1) );	// When we will have Contag = 1?
-				var end_day_idx = Math.ceil( regression_method.invert_func(0) );	// When we will have Contag = 0?
-
-				var zero_day_ms = contag_data[contag_data.length-this.calc_days-1].date-0;
-				var peak_day = new Date(zero_day_ms + peak_day_idx*this.ms_in_day);
-				var end_day = new Date(zero_day_ms + end_day_idx*this.ms_in_day + full_recovery_ms);
-
-				if (isFinite(peak_day_idx) && (peak_day_idx > this.calc_days+1))
-				{
-					if (peak_day_idx > 180)	// +half year
-						values[0] = this.WORDS["slowdown_is_too_small"];
-					else
-						values[0] = Covid19DataTools.formatDate(peak_day);
-				}
-
-				if (isFinite(end_day_idx) && (end_day_idx > this.calc_days + 1 - full_recovery_days))
-				{
-					if (end_day_idx > 180)	// +half year
-						values[1] = this.WORDS["not_soon_more_action_required"];
-					else
-						values[1] = Covid19DataTools.formatDate(end_day);
-				}
-			}
-			else // search step by step
-			{
-				var start_day_ms = contag_data[ contag_data.length-1 ].date-0;
-				var cur_day_idx = regression_method.last_learn_day_id;
-				var start_day_idx = cur_day_idx;
-
-				var curr_contag = regression_method.func(cur_day_idx);
-				if (curr_contag == 1)
-					values[0] = this.WORDS["now"];
-				else if (curr_contag > 1)
-				{
-					// search peakcur_day_idx
-					var peak_idx = Covid19DataTools.FindValueByRegression(regression_method.func, 1, cur_day_idx, this.calc_days);
-					if (peak_idx !== null)
-					{
-						values[0] = Covid19DataTools.formatDate(new Date(start_day_ms + (peak_idx - start_day_idx)*this.ms_in_day) );
-						cur_day_idx = peak_idx;	// let continue search the finish
-					}
-					else
-						values[0] = this.WORDS["slowdown_is_too_small"];
-				}
-
-				var curr_contag = regression_method.func(cur_day_idx);
-				if (curr_contag >= 0.05)
-				{
-					// search finish
-					var finish_idx = Covid19DataTools.FindValueByRegression(regression_method.func, 0, cur_day_idx, this.calc_days);
-					if (finish_idx !== null)
-					{
-						values[1] = Covid19DataTools.formatDate(new Date(start_day_ms + (finish_idx - start_day_idx)*this.ms_in_day + full_recovery_ms) );	// + calc_days_ms - for full recovery
-					}
-					else
-						values[1] = this.WORDS["not_soon_more_action_required"];
-				}
-			}
-
-			var d3_table = d3_box.append("TABLE")
-									.attr("class", "legend");
-			d3_table.append("TR")
-				.selectAll("TD")
-				.data(labels)
-				.enter()
-				.append("TH")
-				.text(d => d);
-			d3_table.append("TR")
-				.selectAll("TD")
-				.data(values)
-				.enter()
-				.append("TD")
-				.text(d => d);
 		}
 
 		// attach element to DOM
 		d3.select(box).append( () => d3_box.node() );
+	}
+
+	ActivateTabs(box)
+	{
+		if (box.offsetWidth >= ((this.width+12)*3))
+			return;
+
+		// create detached element
+		var d3_box = d3.create("div")
+						.attr("class", "tabs");
+		var d3_row = d3_box.append("table").attr("width", this.width)
+						.append("tr");
+
+		// hide charts
+		var d3_charts = d3.select(box).selectAll("DIV.svg");
+		d3_charts.style("display", "none");
+
+		// setup tabs
+		var self = this;
+		var onTabClick = function(nr)
+		{
+			d3_charts.style("display", "none");
+			d3_charts.nodes()[nr].style.display = "block";
+
+			d3_row.selectAll("TD").classed("active", false);
+			d3_row.select("TD:nth-child("+(nr+1)+")").classed("active", true);
+
+			box["myActiveTabNr"] = nr;
+			self.StoreCountriesListCfg();
+		};
+		d3_row.append("td").append("a").text(this.WORDS["analytics"]).on("click", function() { onTabClick(0); });
+		d3_row.append("td").append("a").text(this.WORDS["statistic"]).on("click", function() { onTabClick(1); });
+		d3_row.append("td").append("a").text(this.WORDS["results"]).on("click", function() { onTabClick(2); });
+
+		if (box["myActiveTabNr"] !== undefined)
+			onTabClick(box["myActiveTabNr"]);
+		else
+			onTabClick(1);
+
+		// attach element to DOM
+		box.insertBefore(d3_box.node(), d3_charts.nodes()[0]);
 	}
 
 	StoreCountriesListCfg()
@@ -1113,10 +1292,13 @@ class Covid19Widget
 			var form = this;
 			var country_name = form.getElementsByTagName("SELECT")[0].value;
 			if (country_name)
+			{
 				default_countries.push({
 										name:			country_name,
-										with_neighbors: d3.select(form).select("INPUT[name='with_neighbors']").property("checked")
+										with_neighbors: d3.select(form).select("INPUT[name='with_neighbors']").property("checked"),
+										active_tab_nr:	form["myActiveTabNr"]
 										});
+			}
 		});
 
 		if (default_countries.length)
@@ -1125,12 +1307,13 @@ class Covid19Widget
 			localStorage.removeItem('countries');
 	}
 
-	AddNewCountry(country_name, with_neighbors)
+	AddNewCountry(country_name, with_neighbors, active_tab_nr)
 	{
 		// change last SELECT
 		if (country_name)
 		{
 			var d3_form = this.d3_global_box.select("FORM:last-child");
+			d3_form.node()["myActiveTabNr"] = active_tab_nr;
 			if (with_neighbors)
 				d3_form.select("INPUT[name='with_neighbors']").property("checked", true);
 			d3_form.select("SELECT").property("value", country_name).dispatch("change");
@@ -1182,7 +1365,7 @@ class Covid19Widget
 
 	RemoveCountry()
 	{
-		var box = event.target.parentNode;	// form
+		var box = event.target.parentNode.parentNode;	// form
 		d3.select(box).remove();
 		this.StoreCountriesListCfg();
 	}
@@ -1194,7 +1377,7 @@ class Covid19Widget
 			box = box.parentNode;
 		var country_name = box.getElementsByTagName("SELECT")[0].value;
 
-		var d3_svgs = d3.select(box).selectAll("DIV.svg");
+		var d3_svgs = d3.select(box).selectAll("DIV.svg, DIV.tabs");
 		if (d3_svgs.size() > 0)
 			d3_svgs.remove();
 		else
@@ -1206,17 +1389,23 @@ class Covid19Widget
 		if ((country_name.indexOf(" / ") > 0 && country_name.indexOf("∑") < 0) || (!this.data.GetCountryNeighbours(country_code) && !this.COUNTRY_GROUPS[country_name]))	// region and no data countries
 		{
 			d3_with_neighbors_label.style("visibility", "hidden");
+			d3_with_neighbors_label.node().parentNode.style.display = "none";
 		}
 		else	// country
 		{
 			d3_with_neighbors_label.style("visibility", "visible");
+			d3_with_neighbors_label.node().parentNode.style.display = "block";
 			with_neighbors = d3_with_neighbors_label.select("INPUT").property('checked');
 		}
 
 		if (this.data.countries.length)
 		{
+			this.ShowAnalytic(box, country_name, with_neighbors);
 			this.ShowContagiosus(box, country_name, with_neighbors);
 			this.ShowCummulatives(box, country_name, with_neighbors);
+
+			this.ActivateTabs(box);
+
 			d3.select(box).select("INPUT.remove-btn").style("visibility", "visible").on("click", this.RemoveCountry);
 			this.StoreCountriesListCfg();
 		}

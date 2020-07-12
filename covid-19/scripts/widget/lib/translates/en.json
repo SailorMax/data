@@ -22,6 +22,10 @@
 		"with_neighbors":	"with neighbors",
 		"delete":			"delete",
 
+		"analytics":		"Analytic",
+		"statistic":		"Statistic",
+		"results":			"Results",
+
 		"tested":			"tested",
 		"infected":			"infected",
 		"recovered":		"recovered",
@@ -30,6 +34,15 @@
 		"contagiosus":		"contagiosus",
 		"new_infected":		"new infected",
 		"total_infected":	"total infected",
+
+		"infected_per_period":	"The number of new cases over the past",
+		"days":					"days",
+		"infected_per_x":		"The number of new cases per",
+		"of_persons":			"of persons",
+		"figure_of_change":		"Figure of change",
+		"line":					"line",
+		"parabola":				"parabola",
+		"contag_koef":			"Contagiosus",
 
 		"possible_peak":		"Possible peak",
 		"possible_finish":		"Possible end of quarantine",
@@ -40,6 +53,7 @@
 		"slowdown_is_too_small":	"Slowdown is too small!",
 		"not_soon_more_action_required":	"Not soon. More action required!",
 		"now":								"Now",
+		"almost_done":				"Almost done. Follow the recommendations!",
 
 		"what_are_these_charts":	"What are these charts?",
 		"footnotes":				"Footnotes",
