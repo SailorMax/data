@@ -857,7 +857,7 @@ class Covid19Widget
 							row.label = this.data.GetLocalizedName(row.name) + ": " + Covid19DataTools.GetFormattedNumber(row.confirmed) + " (" + Math.round(row.confirmed/d.confirmed*100) + "%) / " + Covid19DataTools.GetFormattedNumber(d.confirmed);
 
 							offsetY += row.height;
-						})
+						});
 						return d.top_countries;
 					})
 					.join("rect")
@@ -872,11 +872,14 @@ class Covid19Widget
 
 				// legend in actual countries
 				var country_names, labels = [];
-				country_data[ country_data.length-1 ].top_countries.forEach( c => labels.push( {
-																							id: (c.name == "other" ? null : c.name),
-																							value: c.name,
-																							color: country_color[c.name]
-																							} ) );
+				var last_known_day = country_data[ country_data.length-1 ];
+				if (!last_known_day.top_countries.length)	// sometime statistic of last day is unknown
+					last_known_day = country_data[ country_data.length-2 ];
+				last_known_day.top_countries.forEach( c => labels.push( {
+																		id: (c.name == "other" ? null : c.name),
+																		value: c.name,
+																		color: country_color[c.name]
+																		} ) );
 				if (labels.length && (labels.length < (country_names = Object.keys(country_color)).length))
 				{
 					labels.forEach( l => { var idx; if ((idx = country_names.indexOf(l.value)) >= 0) delete country_names[idx]; } );
