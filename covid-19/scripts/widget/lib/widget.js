@@ -569,6 +569,7 @@ class Covid19Widget
 			d3_box.select(".infected_per_period TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_period, true) );
 			var infected_per_x = self.GetInfectedCountPer(daily_changes, calc_days, scale, population);
 			d3_box.select(".infected_per_x TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_x, true) );
+			d3_box.select(".infected_1_per_x TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(Math.floor(scale / infected_per_x), true) );
 
 			box["myCalcDays"] = calc_days;
 			box["myScale"] = scale;
@@ -599,6 +600,12 @@ class Covid19Widget
 				.append("input").attr("type", "number").attr("min", "0").attr("value", scale).on("input", funcRecalculateValues)
 				.select(function(){ return this.parentNode; })
 				.append("span").text(this.WORDS["of_persons"])
+			.select(function(){ return this.parentNode.parentNode; })
+			.append("td");
+
+		// each 1 per X
+		d3_table.append("tr").attr("class", "infected_1_per_x")
+			.append("td").append("span").text(this.WORDS["infected_1_per_x"])
 			.select(function(){ return this.parentNode.parentNode; })
 			.append("td");
 

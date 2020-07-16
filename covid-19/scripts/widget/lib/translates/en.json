@@ -39,6 +39,7 @@
 		"days":					"days",
 		"infected_per_x":		"The number of new cases per",
 		"of_persons":			"of persons",
+		"infected_1_per_x":		"Infected 1 person from",
 		"figure_of_change":		"Figure of change",
 		"line":					"line",
 		"parabola":				"parabola",
