@@ -428,14 +428,14 @@ class Covid19Widget
 		if (scale && (population > 0))
 		{
 			var population_percent = confirmed / population;	// TODO: population - country confirmed?
-			confirmed = Math.ceil(scale * population_percent);
+			confirmed = scale * population_percent;
 		}
 		return confirmed;
 	}
 
 	GetPredictionValues(contag_data, regression_method, daily_changes, population)
 	{
-		var infected_level = this.GetInfectedCountPer(daily_changes, this.calc_days, 100000, population);
+		var infected_level = Math.ceil( this.GetInfectedCountPer(daily_changes, this.calc_days, 100000, population) );
 		if (infected_level > 0 && infected_level < 21)	// Is it good value?
 		{
 			return [this.WORDS["already_passed"], this.WORDS["almost_done"]];
@@ -557,19 +557,25 @@ class Covid19Widget
 						.attr("class", "svg");
 		var d3_table = d3_box.append("table")
 						.attr("class", "analytic_data")
-						.attr("width", this.width)
-						.attr("height", this.height);
+						.attr("width", this.width);
 
 		var funcRecalculateValues = function()
 		{
+			var no_syptoms_ratio = 3;
 			var calc_days = d3_box.select(".infected_per_period TD INPUT").property("value");
 			var scale = d3_box.select(".infected_per_x TD INPUT").property("value");
 
 			var infected_per_period = self.GetInfectedCountPer(daily_changes, calc_days);
-			d3_box.select(".infected_per_period TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_period, true) );
+			d3_box.select(".infected_per_period TD:nth-child(2)")
+				.text( Covid19DataTools.GetFormattedNumber(infected_per_period, true) )
+				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(infected_per_period*no_syptoms_ratio, true) );
 			var infected_per_x = self.GetInfectedCountPer(daily_changes, calc_days, scale, population);
-			d3_box.select(".infected_per_x TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(infected_per_x, true) );
-			d3_box.select(".infected_1_per_x TD:nth-child(2)").text( Covid19DataTools.GetFormattedNumber(Math.floor(scale / infected_per_x), true) );
+			d3_box.select(".infected_per_x TD:nth-child(2)")
+				.text( Covid19DataTools.GetFormattedNumber( Math.ceil(infected_per_x), true ) )
+				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(Math.ceil(infected_per_x*no_syptoms_ratio), true) );
+			d3_box.select(".infected_1_per_x TD:nth-child(2)")
+				.text( Covid19DataTools.GetFormattedNumber( Math.floor(scale / infected_per_x), true ) )
+				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(Math.floor(scale / infected_per_x)*no_syptoms_ratio, true) );
 
 			box["myCalcDays"] = calc_days;
 			box["myScale"] = scale;
@@ -628,12 +634,16 @@ class Covid19Widget
 				.text(this.WORDS[regression_method.name]);
 
 		// contag
+		var contag_diff = contag_data[contag_data.length-1].value - contag_data[contag_data.length-2].value;
 		d3_table.append("tr").attr("class", "contag_koef")
 			.append("td")
 				.text(this.WORDS["contag_koef"])
 			.select(function(){ return this.parentNode; })
 			.append("td")
-				.text(contag_data[contag_data.length-1].value);
+				.append("span").text(contag_data[contag_data.length-1].value)
+				.select(function(){ return this.parentNode; })
+				.append("span").text( () => { return (contag_diff < 0 ? "▼" : (contag_diff > 0 ? "▲" : "")); } )
+					.attr("style", () => { return "color:"+(contag_diff < 0 ? "#1aca1a" : (contag_diff > 0 ? "red" : "")); } );
 
 
 		// predictions
@@ -737,7 +747,7 @@ class Covid19Widget
 			.attr("transform", "translate(0,"+(this.height - this.margin.bottom)+")")
 			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ))
 			.selectAll("text")
-				.attr("font-style", dt => ((dt.getDay() || 7) > 5 ? "italic" : "normal"));
+				.attr("color", dt => ((dt.getDay() || 7) > 5 ? "#888888" : "black"));
 
 		var max_new_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
 //			var max_new_recovered = Covid19DataTools.GetMaxValueFromData(country_data, "recovered");
@@ -1418,6 +1428,8 @@ class Covid19Widget
 			this.ShowAnalytic(box, country_name, with_neighbors);
 			this.ShowContagiosus(box, country_name, with_neighbors);
 			this.ShowCummulatives(box, country_name, with_neighbors);
+
+			// TODO: add compare-tab, where user can countries as labels and compare them via 1:100000 values
 
 			this.ActivateTabs(box);
 
