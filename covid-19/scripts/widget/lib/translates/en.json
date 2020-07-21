@@ -35,8 +35,6 @@
 		"new_infected":		"new infected",
 		"total_infected":	"total infected",
 
-		"with_nosyptoms_possible": "asymptomatic (presumably) ≥",
-
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",
 		"infected_per_x":		"The number of new cases per",
@@ -81,6 +79,7 @@
 		"<a name=\"period\" class=\"footnote-number\">[1]</a> <a href=\"https://ria.ru/20200322/1568965195.html\" target=\"_blank\">11.5 days</a> is the maximum time the first symptoms appear in the majority of those infected.",
 		"<a name=\"contagiosus\" class=\"footnote-number\">[2]</a> Conditional number of people that infects one patient. The arithmetic mean of the weighted number of new patients for the previous 12 days is taken and compared to the current day. The obtained figures are again averaged to the previous 12 days. For the positive dynamics, it should be less than a unit of at least 12 days.",
 		"<a name=\"recovered\" class=\"footnote-number\">[3]</a> Data on the recovered may not be available!",
-		"<a name=\"sum_country\" class=\"footnote-number\">[4]</a> The countries with the sign ∑ are the sum of the values of the lower regions. Their population &ndash; this is the sum of the population of the mentioned regions only! For this reason the population of the group may not coincide with the population of the whole country."
+		"<a name=\"sum_country\" class=\"footnote-number\">[4]</a> The countries with the sign ∑ are the sum of the values of the lower regions. Their population &ndash; this is the sum of the population of the mentioned regions only! For this reason the population of the group may not coincide with the population of the whole country.",
+		"<a name=\"asymptomatic\" class=\"footnote-number\">[5]</a> Number of asymptomatic carriers (distributors) on minimum estimates <a href=\"https://news.mail.ru/society/41415414/\" target=\"_blank\">is twice as high</a> as those with symptoms."
 	]
 }

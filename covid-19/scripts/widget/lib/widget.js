@@ -555,6 +555,8 @@ class Covid19Widget
 		// create detached element
 		var d3_box = d3.create("div")
 						.attr("class", "svg");
+		var d3_tools = d3_box.append("div")
+						.attr("class", "toolbar");
 		var d3_table = d3_box.append("table")
 						.attr("class", "analytic_data")
 						.attr("width", this.width);
@@ -564,18 +566,18 @@ class Covid19Widget
 			var no_syptoms_ratio = 3;
 			var calc_days = d3_box.select(".infected_per_period TD INPUT").property("value");
 			var scale = d3_box.select(".infected_per_x TD INPUT").property("value");
+			var use_asymptomatic = d3_box.select("INPUT.use_asymptomatic").property("checked");
+
+			var asymp_ratio = use_asymptomatic ? 3 : 1;
 
 			var infected_per_period = self.GetInfectedCountPer(daily_changes, calc_days);
 			d3_box.select(".infected_per_period TD:nth-child(2)")
-				.text( Covid19DataTools.GetFormattedNumber(infected_per_period, true) )
-				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(infected_per_period*no_syptoms_ratio, true) );
+				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber(infected_per_period*asymp_ratio, true) );
 			var infected_per_x = self.GetInfectedCountPer(daily_changes, calc_days, scale, population);
 			d3_box.select(".infected_per_x TD:nth-child(2)")
-				.text( Covid19DataTools.GetFormattedNumber( Math.ceil(infected_per_x), true ) )
-				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(Math.ceil(infected_per_x*no_syptoms_ratio), true) );
+				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber( Math.ceil(infected_per_x*asymp_ratio), true ) );
 			d3_box.select(".infected_1_per_x TD:nth-child(2)")
-				.text( Covid19DataTools.GetFormattedNumber( Math.floor(scale / infected_per_x), true ) )
-				.attr( "title", self.WORDS["with_nosyptoms_possible"] + " " + Covid19DataTools.GetFormattedNumber(Math.floor(scale / infected_per_x)*no_syptoms_ratio, true) );
+				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
 
 			box["myCalcDays"] = calc_days;
 			box["myScale"] = scale;
@@ -584,16 +586,37 @@ class Covid19Widget
 		var calc_days = this.calc_days;
 		if (box["myCalcDays"] !== undefined)
 			calc_days = box["myCalcDays"];
-		var scale = 100000;
+		var default_scale = 100000;
+		var scale = default_scale;
 		if (box["myScale"] !== undefined)
 			scale = box["myScale"];
+
+		// settings
+		d3_tools.append("label")
+			.append("input")
+				.attr("type", "checkbox")
+				.attr("class", "use_asymptomatic")
+				.on("input", funcRecalculateValues)
+			.select(function(){ return this.parentNode; })
+			.append("span")
+				.text("учитывать вероятных бессимптомных носителей (по минимуму)")
+			.select(function(){ return this.parentNode; })
+			.append("sup")
+				.append("a")
+					.attr("href", "#asymptomatic")
+					.text("[5]");
 
 		// infected
 		d3_table.append("tr").attr("class", "infected_per_period")
 			.append("td")
 				.append("span").text(this.WORDS["infected_per_period"])
 				.select(function(){ return this.parentNode; })
-				.append("input").attr("type", "number").attr("min", "1").attr("max", daily_changes.length).attr("value", calc_days).on("input", funcRecalculateValues)
+				.append("input").attr("type", "number")
+					.attr("min", "1")
+					.attr("max", daily_changes.length)
+					.attr("value", calc_days)
+					.on("input", funcRecalculateValues)
+					.on("keydown", function() { this.value = self.calc_days; funcRecalculateValues(); })
 				.select(function(){ return this.parentNode; })
 				.append("span").text(this.WORDS["days"])
 			.select(function(){ return this.parentNode.parentNode; })
@@ -603,7 +626,12 @@ class Covid19Widget
 		d3_table.append("tr").attr("class", "infected_per_x")
 			.append("td").append("span").text(this.WORDS["infected_per_x"])
 				.select(function(){ return this.parentNode; })
-				.append("input").attr("type", "number").attr("min", "0").attr("value", scale).on("input", funcRecalculateValues)
+				.append("input")
+					.attr("type", "number")
+					.attr("min", "0")
+					.attr("value", scale)
+					.on("input", funcRecalculateValues)
+					.on("keydown", function() { this.value = default_scale; funcRecalculateValues(); })
 				.select(function(){ return this.parentNode; })
 				.append("span").text(this.WORDS["of_persons"])
 			.select(function(){ return this.parentNode.parentNode; })
