@@ -574,8 +574,13 @@ class Covid19Widget
 			d3_box.select(".infected_per_period TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber(infected_per_period*asymp_ratio, true) );
 			var infected_per_x = self.GetInfectedCountPer(daily_changes, calc_days, scale, population);
+			var out_infected_per_x = infected_per_x*asymp_ratio;
+			if (out_infected_per_x >= 1)
+				out_infected_per_x = Math.ceil(out_infected_per_x);
+			else
+				out_infected_per_x = Math.ceil(out_infected_per_x*100000)/100000;
 			d3_box.select(".infected_per_x TD:nth-child(2)")
-				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber( Math.ceil(infected_per_x*asymp_ratio), true ) );
+				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber( out_infected_per_x, true ) );
 			d3_box.select(".infected_1_per_x TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
 
