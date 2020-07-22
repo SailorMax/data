@@ -519,6 +519,7 @@ class Covid19Widget
 	{
 		var self = this;
 		var population = 0;
+		var country_data = null;
 		var chart_country_name = country_name;
 		var countries_list = this.data.GetCountriesByGroupName(country_name, true, with_neighbors);
 		if (!countries_list)
@@ -527,6 +528,8 @@ class Covid19Widget
 			population = this.data.GetPopulationByCountryName(country_name);
 
 			var daily_changes = this.data.GetChangesByDateData(country_timeline);
+
+			country_data = this.data.GetLimitedDaysByCountryName(country_name, (new Date()-this.ms_in_day*3));	// data for last 3 days
 		}
 		else // global data
 		{
@@ -550,6 +553,32 @@ class Covid19Widget
 			});
 			if (!population)
 				population = this.data.GetPopulationByCountryName(country_name);
+
+			country_data = this.data.GetLimitedDaysByTimeline(countries_timeline, (new Date()-this.ms_in_day*3));	// data for last 3 days
+			country_data = country_data.map(function(day)
+			{
+				var cumulative_values = { date:null };
+				for (var country_name in day)
+				{
+					if (country_name == "date")	// exception
+					{
+						cumulative_values.date = day.date;
+						continue;
+					}
+					else
+					{
+						var country = day[country_name];
+						for (var val_type in country)
+						{
+							if (!cumulative_values[val_type])
+								cumulative_values[val_type] = country[val_type];
+							else
+								cumulative_values[val_type] += country[val_type];
+						}
+					}
+				}
+				return cumulative_values;
+			});
 		}
 
 		// create detached element
@@ -583,6 +612,15 @@ class Covid19Widget
 				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber( out_infected_per_x, true ) );
 			d3_box.select(".infected_1_per_x TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
+
+			var total_infected = country_data[ country_data.length-1 ].confirmed * asymp_ratio;
+			var total_infected_percent = 0;
+			if (population > 0)
+				total_infected_percent = Covid19DataTools.GetFormattedNumber(Math.round((total_infected / population)*100000)/1000, true) + "%";
+			total_infected = Covid19DataTools.GetFormattedNumber(total_infected, true);
+			d3_box.select(".total_infected TD:nth-child(2)")
+				.text( (use_asymptomatic ? "≥ " : "") + (total_infected_percent ? total_infected_percent : total_infected) )
+				.attr("title", (total_infected_percent ? total_infected : ""));
 
 			box["myCalcDays"] = calc_days;
 			box["myScale"] = scale;
@@ -683,7 +721,8 @@ class Covid19Widget
 		var predictions = this.GetPredictionValues(box["myContagData"], box["myRegressionMethod"], daily_changes, population);
 
 		// peak
-		d3_table.append("tr").attr("class", "possible_peak")
+		d3_table.append("tr")
+			.attr("class", "possible_peak")
 			.append("td")
 				.text(this.WORDS["possible_peak"])
 			.select(function(){ return this.parentNode; })
@@ -691,12 +730,21 @@ class Covid19Widget
 				.text(predictions[0]);
 
 		// finish
-		d3_table.append("tr").attr("class", "possible_finish")
+		d3_table.append("tr")
+			.attr("class", "possible_finish")
 			.append("td")
 				.text(this.WORDS["possible_finish"])
 			.select(function(){ return this.parentNode; })
 			.append("td")
 				.text(predictions[1]);
+
+		// total
+		d3_table.append("tr")
+			.attr("class", "total_infected")
+			.append("td")
+				.text( this.WORDS["total_infected"].charAt(0).toUpperCase() + this.WORDS["total_infected"].slice(1) )
+			.select(function(){ return this.parentNode; })
+			.append("td");
 
 		// attach element to DOM
 		d3.select(box).append( () => d3_box.node() );
