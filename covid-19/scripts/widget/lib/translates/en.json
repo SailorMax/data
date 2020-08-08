@@ -22,9 +22,10 @@
 		"with_neighbors":	"with neighbors",
 		"delete":			"delete",
 
-		"analytics":		"Analytic",
-		"statistic":		"Statistic",
+		"analytics":		"Analytics",
+		"statistic":		"Statistics",
 		"results":			"Results",
+		"comparsions":		"Comparsion",
 
 		"tested":			"tested",
 		"infected":			"infected",
@@ -38,6 +39,7 @@
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",
 		"infected_per_x":		"The number of new cases per",
+		"over_the_past":				"over the past",
 		"of_persons":			"of persons",
 		"infected_1_per_x":		"Infected 1 person from",
 		"figure_of_change":		"Figure of change",
@@ -56,6 +58,8 @@
 		"now":								"Now",
 		"almost_done":				"Almost done. Follow the recommendations!",
 
+		"compare_with":				"compare with",
+
 		"what_are_these_charts":	"What are these charts?",
 		"footnotes":				"Footnotes",
 
@@ -71,7 +75,8 @@
 		"Some countries have available data on the tests performed. If the number of tests of different days is very close to each other, these days are marked with a common color to compare detected infections.",
 		"The columns on the second chart always grow, or, if the situation improves, are kept at the same level.",
 		"At the same time, the arrow marks the dynamics of change only of infected people in 13 days. Therefore, its number may be negative.",
-		"Possible peak and quarantine completion are calculated from the current infection rate dynamics and change with it + 14 days at the end for complete recovery of the remaining patients. The event horizon is half a year."
+		"Possible peak and quarantine completion are calculated from the current infection rate dynamics and change with it + 14 days at the end for complete recovery of the remaining patients. The event horizon is half a year.",
+		"In the \"Analytics\" tab, you can enter the estimated number of visitors to the event of interest to find out the estimated number of people infected at the event. At the same time, it is recommended to set the checkbox on top to account for asymptomatic carriers of the disease."
 	],
 
 	"FOOTNOTES_LIST": [

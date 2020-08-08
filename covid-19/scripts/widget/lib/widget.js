@@ -42,7 +42,7 @@ class Covid19Widget
 		if (this.config && this.config.countries)
 			this.default_countries = this.config.countries.split(",").filter(v=>v);
 
-		this.width = 490;
+		this.width = 520;
 		this.height = 200;
 		this.margin = ({top: 20, right: 40, bottom: 20, left: 40});
 		this.bar_space = 30;
@@ -51,7 +51,7 @@ class Covid19Widget
 		this.week_size = Math.floor( (this.width - this.margin.left - this.margin.right) / this.bar_space ) - 1;	// -1 - current day
 		this.week_size_ms = this.week_size * this.ms_in_day;
 		this.min_date = new Date((new Date()) - this.week_size_ms);
-		this.colors = ["#1f78b4","#fb9a99","#cab2d6","#6a3d9a","#b15928","#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#b2df8a","#666666", "#a6cee3", "#17becf", "#bcbd22", "#e377c2","#999999"];
+		this.colors = ["#1f78b4", "#fb9a99", "#cab2d6", "#6a3d9a", "#b15928", "#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#b2df8a", "#666666", "#a6cee3", "#17becf", "#bcbd22", "#e377c2", "#999999"];
 		this.top_infected_percent_limit = 5;
 
 		this.data = new Covid19Data(this.week_size*2, myPath, this.config.lang);
@@ -87,6 +87,8 @@ class Covid19Widget
 					let footnotes;
 					if (footnotes = d3.select(".Cv19SMW .footnotes.collapsed").node())
 						footnotes.classList.remove("collapsed");
+					
+//					anchor.parentNode.classList.add("selected");
 				}
 			}
 
@@ -136,7 +138,7 @@ class Covid19Widget
 		var d3_base_form = this.d3_global_box.select("FORM:first-child");
 		d3_base_form.select("SELECT")
 					.selectAll('option')
-					.data(this.data.GetSortedLocalizedCountryList(true))
+					.data( this.data.GetSortedLocalizedCountryList(true) )
 					.enter()
 					.append('option')
 					.property("value", d => d.id)	// source data has spaces around names => better setup value, than use text
@@ -186,7 +188,7 @@ class Covid19Widget
 			if (country.substr)
 				this.AddNewCountry(country);
 			else
-				this.AddNewCountry(country.name, country.with_neighbors, country.active_tab_nr);
+				this.AddNewCountry(country.name, country.with_neighbors, country.active_tab_nr, country.compares_list);
 		});
 
 		// restore min-height to reduce when user remove country
@@ -317,7 +319,7 @@ class Covid19Widget
 		var funcGetConfirmedY = d => y_scale(d.confirmed) + this.margin.top;
 
 		d3_svg.append("g")
-			.selectAll("circle")
+			.selectAll("rect")
 			.data( country_data )
 			.enter()
 			.append("rect")
@@ -521,11 +523,15 @@ class Covid19Widget
 		var population = 0;
 		var country_data = null;
 		var chart_country_name = country_name;
+		var last_day_is_empty = false;
 		var countries_list = this.data.GetCountriesByGroupName(country_name, true, with_neighbors);
 		if (!countries_list)
 		{
 			var country_timeline = this.data.GetTimelineByCountryName(country_name);
 			population = this.data.GetPopulationByCountryName(country_name);
+
+			var last_day_key = Object.keys(country_timeline).slice(-1)[0];
+			last_day_is_empty = !country_timeline[last_day_key].confirmed;
 
 			var daily_changes = this.data.GetChangesByDateData(country_timeline);
 
@@ -541,6 +547,10 @@ class Covid19Widget
 				countries_timeline = this.data.GetTimelineWithoutCountryDuplicates();
 				countries_list = this.data.GetAllCountryNames();
 			}
+
+			var last_day_key = Object.keys(countries_timeline).slice(-1)[0];
+			var first_country_key = Object.keys(countries_timeline[last_day_key]).slice(-1)[0];
+			last_day_is_empty = !countries_timeline[last_day_key][first_country_key].confirmed;
 
 			var daily_changes = this.data.GetChangesByDateData(countries_timeline, true);
 
@@ -613,7 +623,10 @@ class Covid19Widget
 			d3_box.select(".infected_1_per_x TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
 
-			var total_infected = country_data[ country_data.length-1 ].confirmed * asymp_ratio;
+			var last_day_data = country_data[ country_data.length-1 ];
+			if (!last_day_data.confirmed)
+				last_day_data = country_data[ country_data.length-2 ];
+			var total_infected = last_day_data.confirmed * asymp_ratio;
 			var total_infected_percent = 0;
 			if (population > 0)
 				total_infected_percent = Covid19DataTools.GetFormattedNumber(Math.round((total_infected / population)*100000)/1000, true) + "%";
@@ -622,11 +635,12 @@ class Covid19Widget
 				.text( (use_asymptomatic ? "≥ " : "") + (total_infected_percent ? total_infected_percent : total_infected) )
 				.attr("title", (total_infected_percent ? total_infected : ""));
 
-			box["myCalcDays"] = calc_days;
+			box["myCalcDays"] = calc_days;	// remember for country switch
 			box["myScale"] = scale;
 		};
 
-		var calc_days = this.calc_days;
+//		var calc_days = this.calc_days;
+		var calc_days = 14;	// better use official values
 		if (box["myCalcDays"] !== undefined)
 			calc_days = box["myCalcDays"];
 		var default_scale = 100000;
@@ -659,7 +673,7 @@ class Covid19Widget
 					.attr("max", daily_changes.length)
 					.attr("value", calc_days)
 					.on("input", funcRecalculateValues)
-					.on("keydown", function() { if (event.keyCode == 27) { this.value = self.calc_days; funcRecalculateValues(); } })
+					.on("keydown", function() { if (event.keyCode == 27) { this.value = calc_days; funcRecalculateValues(); } })
 				.select(function(){ return this.parentNode; })
 				.append("span").text(this.WORDS["days"])
 			.select(function(){ return this.parentNode.parentNode; })
@@ -690,6 +704,8 @@ class Covid19Widget
 		// figure
 		var contag_data = this.data.GetContagiosusByDateData(daily_changes, "confirmed", this.calc_days);
 		contag_data = Covid19DataTools.GetSimpleMovingWeightedAverage(contag_data, "value", this.calc_days, 2);
+		if (last_day_is_empty)
+			contag_data.pop();
 		// store box general values
 		box["myContagData"] = contag_data;
 		contag_data = this.data.GetDataByMinDate( contag_data, this.min_date );
@@ -708,8 +724,14 @@ class Covid19Widget
 		var contag_diff = contag_data[contag_data.length-1].value - contag_data[contag_data.length-2].value;
 		d3_table.append("tr").attr("class", "contag_koef")
 			.append("td")
-				.text(this.WORDS["contag_koef"])
-			.select(function(){ return this.parentNode; })
+				.append("span")
+					.text(this.WORDS["contag_koef"])
+				.select(function(){ return this.parentNode; })
+				.append("sup")
+					.append("a")
+						.attr("href", "#contagiosus")
+						.text("[2]")
+			.select(function(){ return this.parentNode.parentNode.parentNode; })
 			.append("td")
 				.append("span").text(contag_data[contag_data.length-1].value)
 				.select(function(){ return this.parentNode; })
@@ -1016,7 +1038,7 @@ class Covid19Widget
 							node.addEventListener("click", ()=>this.ShowTheCountryStat(d.id, box));
 						return node;
 					})
-					.attr( "style", d => "display:inline-block; padding-left:5px; height:10px; font-size:12px; line-height:11px; border-left:10px solid "+d.color )
+					.attr( "style", d => "border-left:10px solid "+d.color )
 					.text( d => d.value );
 			}
 
@@ -1082,7 +1104,7 @@ class Covid19Widget
 		d3.select(box).append( () => d3_box.node() );
 	}
 
-	ShowCummulatives(box, country_name, with_neighbors)
+	ShowCumulative(box, country_name, with_neighbors)
 	{
 		var self = this;
 		var population = 0;
@@ -1176,6 +1198,8 @@ class Covid19Widget
 							}
 		);
 		var last_day_data = country_data[country_data.length-1];
+		if (!last_day_data.confirmed)	// sometimes last day data can be undefined (will be later)
+			last_day_data = country_data[country_data.length-2];
 
 		// create detached element
 		var d3_box = d3.create("div")
@@ -1190,7 +1214,7 @@ class Covid19Widget
 			.attr("transform", "translate(0,"+(this.height - this.margin.bottom)+")")
 			.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ))
 			.selectAll("text")
-				.attr("font-style", dt => ((dt.getDay() || 7) > 5 ? "italic" : "normal"));
+				.attr("color", dt => ((dt.getDay() || 7) > 5 ? "#888888" : "black"));
 
 		var max_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
 		var has_infections = max_confirmed > 0;
@@ -1263,6 +1287,8 @@ class Covid19Widget
 			// arrow of infected
 			var first_day = country_data[0];
 			var last_day = country_data[country_data.length-1];
+			if (!last_day.confirmed)	// last day has not data (its will be later)
+				last_day = country_data[country_data.length-2];
 
 			d3_svg.append("marker")
 				.attr("id", "arrow")
@@ -1312,12 +1338,13 @@ class Covid19Widget
 			funcAppendPercentValue(d3_svg, first_day, last_day, x_scale(last_day.date) + x_scale.bandwidth(), y_scale(last_day.confirmed)+10 + 4);
 
 			// store box general values
-			box["myCummulativeValues"] = {
+/*
+			box["myCumulativeValues"] = {
 										first_day_minus_week: first_day_minus_week,
 										first_day: first_day,
 										last_day: last_day
 										};
-
+*/
 			// legend
 			var self = this;
 			Array(
@@ -1346,10 +1373,308 @@ class Covid19Widget
 		d3.select(box).append( () => d3_box.node() );
 	}
 
+	ShowComparsions(box, country_name, with_neighbors)
+	{
+		var self = this;
+
+		// create detached element
+		var d3_box = d3.create("div")
+						.attr("class", "svg");
+		var d3_svg = d3_box.append("svg")
+						.attr("width", this.width)
+						.attr("height", this.height);
+
+		var funcGetCountryData = function(country_name)
+		{
+			var country_data = null;
+			var population = 0;
+			var chart_country_name = country_name;
+			var countries_list = self.data.GetCountriesByGroupName(country_name, true);		// without neighbors!
+			if (!countries_list)
+			{
+				var country_timeline = self.data.GetTimelineByCountryName(country_name);
+				population = self.data.GetPopulationByCountryName(country_name);
+
+				var daily_changes = self.data.GetChangesByDateData(country_timeline);
+
+//				country_data = self.data.GetLimitedDaysByCountryName(country_name, self.min_date-self.week_size_ms);
+			}
+			else // global data
+			{
+				var countries_timeline = null;
+				if (countries_list.length)
+					countries_timeline = self.data.GetTimelineByCountryName(countries_list);
+				else // Wolrd
+				{
+					countries_timeline = self.data.GetTimelineWithoutCountryDuplicates();
+					countries_list = self.data.GetAllCountryNames();
+				}
+
+				var daily_changes = self.data.GetChangesByDateData(countries_timeline, true);
+
+				countries_list.map(function(country_name)
+				{
+					var country_population = self.data.GetPopulationByCountryName(country_name);
+					if (country_population)
+						population += country_population;
+				});
+				if (!population)
+					population = self.data.GetPopulationByCountryName(country_name);
+/*
+				country_data = self.data.GetLimitedDaysByTimeline(countries_timeline, self.min_date-self.week_size_ms);
+				country_data = country_data.map(function(day)
+				{
+					var cumulative_values = { date:null };
+					for (var country_name in day)
+					{
+						if (country_name == "date")	// exception
+						{
+							cumulative_values.date = day.date;
+							continue;
+						}
+						else
+						{
+							var country = day[country_name];
+							for (var val_type in country)
+							{
+								if (!cumulative_values[val_type])
+									cumulative_values[val_type] = country[val_type];
+								else
+									cumulative_values[val_type] += country[val_type];
+							}
+						}
+					}
+					return cumulative_values;
+				});
+*/
+			}
+
+			// calc per 100k
+			var two_week_sum = 0;
+			var two_week_values = [];
+			daily_changes.map(
+							function(el, idx, arr)
+							{
+								if (two_week_values.length == 14)
+									two_week_sum -= two_week_values.shift();
+								two_week_values.push( el.confirmed );
+								two_week_sum += el.confirmed;
+
+								el.per100k = (two_week_sum / population) * 100000;
+								if (el.per100k > 0.1)
+									el.per100k = Math.ceil(el.per100k);
+								else
+									el.per100k = 0;
+
+								return el;
+							}
+			);
+
+			// leave only required data
+			daily_changes.splice(0, daily_changes.length-self.week_size-1);
+
+			return daily_changes;
+		};
+
+	
+		var funcDrawAxis = function(x_scale, y_scale)
+		{
+			d3_svg.append("text")
+				.attr("font-family", "sans-serif")
+				.attr("font-size", 11)
+				.attr("y", 10)
+				.text(self.WORDS["infected_per_x"].toLowerCase() + " 100,000 " + self.WORDS["over_the_past"] + " 14 " + self.WORDS["days"]);
+
+			// x-axis
+			d3_svg.append("g")
+				.attr("transform", "translate(0,"+(self.height - self.margin.bottom)+")")
+				.call(d3.axisBottom(x_scale).tickFormat( d => Covid19DataTools.formatDate(d) ))
+				.selectAll("text")
+					.attr("color", dt => ((dt.getDay() || 7) > 5 ? "#888888" : "black"));
+
+			// y-axis
+			d3_svg.append("g")
+				.attr("transform", "translate("+self.margin.left+","+self.margin.top+")")
+				.call(d3.axisLeft(y_scale))
+				.call(g => g.selectAll(".tick")
+							.each((val, idx, arr) => {
+									if (val >= Covid19DataTools.largetNumberLimiter)
+										d3.select(arr[idx]).selectAll("text").text( Covid19DataTools.GetFormattedNumber(val) );
+							})
+				)
+				.call(g => g.select(".domain").remove());
+		}
+
+		var funcDrawCompanyData = function(country_name, daily_changes, color, x_scale, y_scale)
+		{
+			// per100k
+			var d3_mean_line = d3.line()
+								.x( d => x_scale(d.date)+Math.round(x_scale.bandwidth()/2) )
+								.y( d => y_scale(d.per100k) + self.margin.top);
+			d3_svg.append("path")
+				.attr("d", d3_mean_line(daily_changes))
+				.attr("stroke", color)
+				.attr("fill", "none");
+
+			d3_svg.append("g")
+				.selectAll("rect")
+				.data( daily_changes )
+				.enter()
+				.append("rect")
+				.attr("x", d => x_scale(d.date)+Math.round(x_scale.bandwidth()/2) - 3 )
+				.attr("y", d => y_scale(d.per100k) + self.margin.top - 3 )
+				.attr("width", 6)
+				.attr("height", 6)
+				.attr("fill", color)
+				.on("click", self.ShowHideHint)
+				.append("title")	// hint
+					.text(d => self.data.GetLocalizedName(country_name)+": "+d.per100k);
+			//
+		};
+
+		var base_country = country_name;
+		var funcDrawCompareData = function(country_names)
+		{
+			// clear old data
+			d3_svg.selectAll("*").remove();
+			d3_box.selectAll("UL").remove();
+
+			// init
+			var color_idx = 0;
+			var country_color = {};
+			var labels = [];
+			var countries_data = {};
+			var max_per100k = 0;
+
+			for (var country_name of country_names)
+			{
+				country_color[ country_name ] = self.colors[color_idx++];
+				labels.push(
+					{
+						id:		(base_country!=country_name ? country_name : null),
+						value:	self.data.GetLocalizedName(country_name),
+						color:	country_color[country_name],
+						country_name: country_name
+					}
+				);
+				countries_data[ country_name ] = funcGetCountryData( country_name );
+				// limit used colors
+				if (color_idx >= self.colors.length)
+					color_idx--;
+
+				var local_max_per100k = Covid19DataTools.GetMaxValueFromData(countries_data[ country_name ], "per100k");
+				if (max_per100k < local_max_per100k)
+					max_per100k = local_max_per100k;
+			}
+			//
+
+			// axis
+			var x_scale = d3.scaleBand(self.data.GetDaysListFromData(countries_data[base_country]), [self.margin.left, self.width - self.margin.left]).paddingInner(0.5).paddingOuter(0.5);
+//			var y_scale = d3.scaleLinear([Math.ceil(max_per100k*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]);
+			var y_scale = d3.scaleSymlog([Math.ceil(max_per100k*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]).constant(30);
+			funcDrawAxis(x_scale, y_scale);
+			//
+
+			for (var country_name of country_names)
+				funcDrawCompanyData( country_name, countries_data[ country_name ], country_color[ country_name ], x_scale, y_scale );
+
+			d3_box.append("UL")
+				.attr("class", "legend")
+				.selectAll("LI")
+				.data(labels)
+				.join("LI")
+				.append(d =>
+				{
+					var node = d3.create(d.id ? "A" : "SPAN").node();
+					if (d.id)
+						node.addEventListener("click", ()=>self.ShowTheCountryStat(d.id, box));
+					return node;
+				})
+					.attr( "style", d => "border-left:10px solid "+d.color )
+					.text( d => d.value )
+				.select( function(){ return this.parentNode; } )
+				.each( function(d)
+				{
+					if (!d.id)
+						return;
+
+					d3.select(this).append("A")
+									.attr("class", "sup_x")
+									.property("myCountryName", d.country_name)
+									.text("x")
+									.on("click", funcRemoveComparsionCountry);
+				});
+			//
+		};
+
+		var compare_country_names = box["myComparesList"] || [];
+		var funcCompareWith = function(init)
+		{
+			if (this.value != "")
+			{
+				compare_country_names.push( this.value );
+				this.options[ this.selectedIndex ].style.display = "none";
+				this.value = "";
+			}
+
+			funcDrawCompareData(compare_country_names);
+
+			box["myComparesList"] = compare_country_names;
+			if (!init)
+				self.StoreCountriesListCfg();
+		};
+
+		var funcRemoveComparsionCountry = function()
+		{
+			var country2remove = this["myCountryName"];
+			compare_country_names = compare_country_names.filter( country => country != country2remove );
+
+			funcDrawCompareData(compare_country_names);
+			this.parentNode.remove();
+			// reactivate country in selection
+			var compareCountry = d3_compareCountry.node();
+			for (var option of compareCountry.options)
+				if (country2remove == option.value)
+				{
+					option.style.display = "block";
+					break;
+				}
+
+			box["myComparesList"] = compare_country_names;
+			self.StoreCountriesListCfg();
+		};
+
+		var d3_compareCountry = d3_box.append("p")
+										.attr("class", "compare_slection")
+										.append("span")
+											.text(this.WORDS["compare_with"]+": ")
+										.select(function(){ return this.parentNode; })
+										.append( () => d3.select(box).select("SELECT").node().cloneNode(true) )
+											.attr("name", "compare_countries")
+											.on("change", funcCompareWith)
+											.insert("option", ":first-child")
+												.select(function(){ return this.parentNode; });
+		if (compare_country_names.length)
+		{
+			var compareCountry = d3_compareCountry.node();
+			for (var option of compareCountry.options)
+				if (compare_country_names.indexOf(option.value) >= 0)
+					option.style.display = "none";
+			d3_compareCountry.property("value", "");
+		}
+		else
+			d3_compareCountry.property("value", country_name);
+		funcCompareWith.call(d3_compareCountry.node(), true);
+
+
+		// attach element to DOM
+		d3.select(box).append( () => d3_box.node() );
+	}
+
 	ActivateTabs(box)
 	{
-		if (box.offsetWidth >= ((this.width+12)*3))
-			return;
+//		if (box.offsetWidth >= ((this.width+12)*3))
+//			return;
 
 		// create detached element
 		var d3_box = d3.create("div")
@@ -1377,6 +1702,7 @@ class Covid19Widget
 		d3_row.append("td").append("a").text(this.WORDS["analytics"]).on("click", function() { onTabClick(0); });
 		d3_row.append("td").append("a").text(this.WORDS["statistic"]).on("click", function() { onTabClick(1); });
 		d3_row.append("td").append("a").text(this.WORDS["results"]).on("click", function() { onTabClick(2); });
+		d3_row.append("td").append("a").text(this.WORDS["comparsions"]).on("click", function() { onTabClick(3); });
 
 		if (box["myActiveTabNr"] !== undefined)
 			onTabClick(box["myActiveTabNr"]);
@@ -1402,7 +1728,8 @@ class Covid19Widget
 				default_countries.push({
 										name:			country_name,
 										with_neighbors: d3.select(form).select("INPUT[name='with_neighbors']").property("checked"),
-										active_tab_nr:	form["myActiveTabNr"]
+										active_tab_nr:	form["myActiveTabNr"],
+										compares_list:	form["myComparesList"]
 										});
 			}
 		});
@@ -1413,13 +1740,15 @@ class Covid19Widget
 			localStorage.removeItem('countries');
 	}
 
-	AddNewCountry(country_name, with_neighbors, active_tab_nr)
+	AddNewCountry(country_name, with_neighbors, active_tab_nr, compares_list)
 	{
 		// change last SELECT
 		if (country_name)
 		{
 			var d3_form = this.d3_global_box.select("FORM:last-child");
-			d3_form.node()["myActiveTabNr"] = active_tab_nr;
+			d3_form
+				.property("myActiveTabNr", active_tab_nr)
+				.property("myComparesList", compares_list);
 			if (with_neighbors)
 				d3_form.select("INPUT[name='with_neighbors']").property("checked", true);
 			d3_form.select("SELECT").property("value", country_name).dispatch("change");
@@ -1508,7 +1837,8 @@ class Covid19Widget
 		{
 			this.ShowAnalytic(box, country_name, with_neighbors);
 			this.ShowContagiosus(box, country_name, with_neighbors);
-			this.ShowCummulatives(box, country_name, with_neighbors);
+			this.ShowCumulative(box, country_name, with_neighbors);
+			this.ShowComparsions(box, country_name, with_neighbors);
 
 			// TODO: add compare-tab, where user can countries as labels and compare them via 1:100000 values
 
