@@ -1472,6 +1472,8 @@ class Covid19Widget
 
 			// leave only required data
 			daily_changes.splice(0, daily_changes.length-self.week_size-1);
+			if (!daily_changes[ daily_changes.length-1 ].total_confirmed)		// sometimes currently last day is undefined (data will be later)
+				daily_changes[ daily_changes.length-1 ].per100k = daily_changes[ daily_changes.length-2 ].per100k;
 
 			return daily_changes;
 		};
@@ -1605,7 +1607,8 @@ class Covid19Widget
 			{
 				var country_data = countries_data[ country_name ];
 				funcDrawCompanyData( country_name, country_data, country_color[ country_name ], x_scale, y_scale );
-				last_values.push( country_data[ country_data.length-1 ].per100k );
+				if (country_data[ country_data.length-1 ].per100k > 0)
+					last_values.push( country_data[ country_data.length-1 ].per100k );
 			}
 
 			// output last values

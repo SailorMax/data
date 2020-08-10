@@ -65,13 +65,14 @@ class Covid19Data
 		for (var ts in country_timeline)
 		{
 			var day_changes = {
-						date: new Date(ts-0)
+						date: new Date(ts-0),
 						};
 			var day = country_timeline[ts];
 			if (day_has_countries)
 			{
 				for (var fname of this.value_field_names)
 					day_changes[fname] = 0;
+				day_changes["total_confirmed"] = 0;
 
 				var country_changes = [];
 				for (var country_name in day)
@@ -82,6 +83,7 @@ class Covid19Data
 
 					for (var fname of this.value_field_names)
 						day_changes[fname] += country_day_changes[fname];
+					day_changes["total_confirmed"] += day[country_name]["confirmed"];
 					country_changes.push( country_day_changes );
 				}
 
@@ -90,6 +92,7 @@ class Covid19Data
 			else
 			{
 				this.SetChangesPerDay(day_changes, day, prev_day);
+				day_changes["total_confirmed"] = day.confirmed;
 			}
 
 			changes.push( day_changes );
