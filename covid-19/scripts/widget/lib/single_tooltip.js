@@ -9,7 +9,7 @@ class Covid19SingleTooltip
 
 	ShowHideHint(sender, data, idx, els_list)
 	{
-		if (els_list && (els_list[0].tagName == "rect") && (d3.select(els_list[0]).attr("x") == d3.select(els_list[1]).attr("x"))) // multiple bars
+		if (els_list && (els_list.length > 1) && (els_list[0].tagName == "rect") && (d3.select(els_list[0]).attr("x") == d3.select(els_list[1]).attr("x"))) // multiple bars
 		{
 			sender = els_list[0].parentNode;
 		}
@@ -39,7 +39,7 @@ class Covid19SingleTooltip
 			//
 			title = data;
 		}
-		else if ((els_list[0].tagName == "rect") && d3.select(els_list[0]).attr("x") == d3.select(els_list[1]).attr("x")) // multiple bars
+		else if ((els_list.length > 1) && (els_list[0].tagName == "rect") && d3.select(els_list[0]).attr("x") == d3.select(els_list[1]).attr("x")) // multiple bars
 		{
 			sender = els_list[0].parentNode;
 			sender_coords = {x:0, y:0, width:0, height:0};

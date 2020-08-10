@@ -1520,15 +1520,40 @@ class Covid19Widget
 				.selectAll("rect")
 				.data( daily_changes )
 				.enter()
-				.append("rect")
-				.attr("x", d => x_scale(d.date)+Math.round(x_scale.bandwidth()/2) - 3 )
-				.attr("y", d => y_scale(d.per100k) + self.margin.top - 3 )
-				.attr("width", 6)
-				.attr("height", 6)
-				.attr("fill", color)
-				.on("click", self.ShowHideHint)
-				.append("title")	// hint
-					.text(d => self.data.GetLocalizedName(country_name)+": "+d.per100k);
+				.each( function(d, idx, arr) {
+					var angle = 0;
+					if ((idx == arr.length-1) && (d.per100k != daily_changes[idx-1].per100k))
+						angle = ((d.per100k < daily_changes[idx-1].per100k) ? 180 : 360);
+
+					if (!angle)
+					{
+						d3.select(this)
+							.append("rect")
+								.attr("x", d => x_scale(d.date)+Math.round(x_scale.bandwidth()/2) - 3 )
+								.attr("y", d => y_scale(d.per100k) + self.margin.top - 3 )
+								.attr("width", 6)
+								.attr("height", 6)
+								.attr("fill", color)
+								.on("click", self.ShowHideHint)
+								.append("title")	// hint
+									.text(d => self.data.GetLocalizedName(country_name)+": "+d.per100k);
+					}
+					else	// angle only for triangles
+					{
+						d3.select(this)
+							.append("path")
+								.attr("d", d3.symbol().type(d3.symbolTriangle).size(30))
+								.attr("transform", d => "translate("
+																+(x_scale(d.date)+Math.round(x_scale.bandwidth()/2))
+																+", "
+																+(y_scale(d.per100k) + self.margin.top)
+																+"), rotate("+angle+")")
+								.attr("fill", color)
+								.on("click", self.ShowHideHint)
+								.append("title")	// hint
+									.text(d => self.data.GetLocalizedName(country_name)+": "+d.per100k);
+					}
+				})
 			//
 		};
 
@@ -1575,9 +1600,50 @@ class Covid19Widget
 			funcDrawAxis(x_scale, y_scale);
 			//
 
+			var last_values = [];
 			for (var country_name of country_names)
-				funcDrawCompanyData( country_name, countries_data[ country_name ], country_color[ country_name ], x_scale, y_scale );
+			{
+				var country_data = countries_data[ country_name ];
+				funcDrawCompanyData( country_name, country_data, country_color[ country_name ], x_scale, y_scale );
+				last_values.push( country_data[ country_data.length-1 ].per100k );
+			}
 
+			// output last values
+			var current_group = {y:0, values:[]};
+			var last_value_groups = [];
+			last_values.sort( (a,b) => b-a );
+			for (var last_value of last_values)
+			{
+				var y = y_scale(last_value) + self.margin.top + 3;
+				if (((y - current_group.y) >= 6) && (current_group.values.length > 0))
+				{
+					last_value_groups.push( current_group );
+					current_group = {y:y, values:[last_value]};
+				}
+				else
+				{
+					if (current_group.y)
+						current_group.y = (y + current_group.y)/2;
+					else
+						current_group.y = y;	// first item use as is
+					current_group.values.unshift( last_value );
+				}
+			}
+			if (current_group.values.length > 0)
+				last_value_groups.push( current_group );
+
+			for (var values_group of last_value_groups)
+			{
+				d3_svg.append("text")
+						.attr("x", (self.width - self.margin.right - 10))
+						.attr("y", values_group.y)
+						.attr("font-family", "sans-serif")
+						.attr("font-size", 10)
+						.attr("fill", "black")
+						.text( values_group.values.join(",") );
+			}
+
+			// legend
 			d3_box.append("UL")
 				.attr("class", "legend")
 				.selectAll("LI")
@@ -1853,3 +1919,9 @@ class Covid19Widget
 		}
 	}
 }
+
+/*
+TODO:
+1. keep compares when change base country
+2. compare by overal death?
+*/
