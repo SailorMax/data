@@ -1485,7 +1485,7 @@ class Covid19Widget
 				.attr("font-family", "sans-serif")
 				.attr("font-size", 11)
 				.attr("y", 10)
-				.text(self.WORDS["infected_per_x"].toLowerCase() + " 100,000 " + self.WORDS["over_the_past"] + " 14 " + self.WORDS["days"]);
+				.text(self.WORDS["infected_per_x"].toLowerCase() + " 100,000 " + self.WORDS["of_persons"] + " " + self.WORDS["over_the_past"] + " 14 " + self.WORDS["days"]);
 
 			// x-axis
 			d3_svg.append("g")
@@ -1723,7 +1723,7 @@ class Covid19Widget
 											.on("change", funcCompareWith)
 											.insert("option", ":first-child")
 												.select(function(){ return this.parentNode; });
-		if (compare_country_names.length)
+		if (compare_country_names.length && (compare_country_names.indexOf(base_country) >= 0))		// base_country can be changed => do not just load
 		{
 			var compareCountry = d3_compareCountry.node();
 			for (var option of compareCountry.options)
@@ -1732,7 +1732,16 @@ class Covid19Widget
 			d3_compareCountry.property("value", "");
 		}
 		else
-			d3_compareCountry.property("value", country_name);
+		{
+			if (box["myPreviousBaseName"])
+				compare_country_names[0] = base_country;			// rewrite first item, because it is previous base country (in most cases)
+
+			if (compare_country_names.indexOf(base_country) < 0)
+				d3_compareCountry.property("value", base_country);
+			else
+				d3_compareCountry.property("value", "");
+		}
+		box["myPreviousBaseName"] = base_country;
 		funcCompareWith.call(d3_compareCountry.node(), true);
 
 
