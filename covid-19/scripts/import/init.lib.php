@@ -1,4 +1,7 @@
 <?
+set_time_limit(900);					// script timeout
+ini_set('default_socket_timeout', 900);	// loader timeout
+
 chdir(__DIR__);
 
 class COVID19DATA
