@@ -33,7 +33,7 @@ jobs:
       - name: Run update script
         run: |
           php -d short_open_tag=On -d error_reporting="E_ALL & ~E_NOTICE" -f covid-19/scripts/import/import.php ../../
-          echo "::set-env name=GIT_CHANGED_FILES::$(git diff --name-status)"
+          echo "GIT_CHANGED_FILES=$(git diff --name-status)" >> $GITHUB_ENV
 
       - name: Check emails log
         run: |
