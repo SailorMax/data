@@ -87,7 +87,7 @@ class Covid19Widget
 					let footnotes;
 					if (footnotes = d3.select(".Cv19SMW .footnotes.collapsed").node())
 						footnotes.classList.remove("collapsed");
-					
+
 //					anchor.parentNode.classList.add("selected");
 				}
 			}
@@ -1315,7 +1315,7 @@ class Covid19Widget
 				var diff_value = last_day.infected - first_day.infected;
 				if (first_day.infected)
 					var diff_percent = Math.round(diff_value / first_day.infected * 1000) / 10;
-				else 
+				else
 					var diff_percent = 0;
 				if (diff_percent > 10 || diff_percent < -10)	// large numbers do not require so accuracy value (save space)
 					diff_percent = Math.round(diff_percent);
@@ -1478,7 +1478,7 @@ class Covid19Widget
 			return daily_changes;
 		};
 
-	
+
 		var funcDrawAxis = function(x_scale, y_scale)
 		{
 			d3_svg.append("text")
@@ -1637,13 +1637,22 @@ class Covid19Widget
 
 			for (var values_group of last_value_groups)
 			{
+				var values_output = values_group.values.join(",");
+				if (values_output.length > 10)
+				{
+					values_output = values_output.substr(0, 9);
+					if (values_output.indexOf(",") > 0)
+						values_output = values_output.substr(0, values_output.lastIndexOf(",")+1) + "..";
+				}
 				d3_svg.append("text")
 						.attr("x", (self.width - self.margin.right - 10))
 						.attr("y", values_group.y)
 						.attr("font-family", "sans-serif")
 						.attr("font-size", 10)
 						.attr("fill", "black")
-						.text( values_group.values.join(",") );
+						.text( values_output )
+						.append("title")	// hint
+							.text( values_group.values.join(",") );
 			}
 
 			// legend
