@@ -4,7 +4,7 @@ name: Update COVID-19 data
 # events but only for the master branch OR schedule cron
 on:
   schedule:
-  - cron: '30 2,5,8,11,9 * * *'
+  - cron: '30 2,5,8,11 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - name: Run update script
         run: |
           php -d short_open_tag=On -d error_reporting="E_ALL & ~E_NOTICE" -f covid-19/scripts/import/import.php ../../
-          echo "GIT_CHANGED_FILES=\"$(git diff --name-status | head -n 1)\"" >> $GITHUB_ENV
+          echo "GIT_CHANGED_FILES=$(git diff --name-status | head -n 1)" >> $GITHUB_ENV
 
       - name: Check emails log
         run: |
