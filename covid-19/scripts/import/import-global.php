@@ -9,10 +9,12 @@ $COUNTRY_CODE = array(
 );
 
 $REGION_CODE = array(
-	// ships
 	"CA" => array(
-		"Diamond Princess"	=> null,
-		"Grand Princess"	=> null,
+		// ships
+		"Diamond Princess"			=> null,
+		"Grand Princess"			=> null,
+		// pseudo regions
+		"Repatriated Travellers"	=> null,
 	)
 );
 
