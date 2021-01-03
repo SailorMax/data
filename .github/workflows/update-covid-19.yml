@@ -48,6 +48,7 @@ jobs:
           git status
           git add -A
           git commit -m "covid-19 / refresh database"
+          git pull
 
       - name: Push changes
         if: env.GIT_CHANGED_FILES != ''
