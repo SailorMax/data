@@ -327,10 +327,10 @@ class COVID19DATA
 				if (isset($this->new_data[$data_key]["timeline"][$date]))
 				{
 					$new_data_row =& $this->new_data[$data_key]["timeline"][$date];
-					if ($new_data_row["tested"] == $day_data["tested"]
-						&& $new_data_row["confirmed"] == $day_data["confirmed"]
-						&& $new_data_row["recovered"] == $day_data["recovered"]
-						&& $new_data_row["deaths"] == $day_data["deaths"]
+					if (((isset($new_data_row["tested"]) && ($new_data_row["tested"] == $day_data["tested"])) || (empty($new_data_row["tested"]) && !$day_data["tested"]))
+						&& ((isset($new_data_row["confirmed"]) && ($new_data_row["confirmed"] == $day_data["confirmed"])) || (empty($new_data_row["confirmed"]) && !$day_data["confirmed"]))
+						&& ((isset($new_data_row["recovered"]) && ($new_data_row["recovered"] == $day_data["recovered"])) || (empty($new_data_row["recovered"]) && !$day_data["recovered"]))
+						&& ((isset($new_data_row["deaths"]) && ($new_data_row["deaths"] == $day_data["deaths"])) || (empty($new_data_row["deaths"]) && !$day_data["deaths"]))
 						)
 					{
 						unset($this->new_data[$data_key]["timeline"][$date]);
