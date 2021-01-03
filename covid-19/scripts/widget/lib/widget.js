@@ -624,7 +624,7 @@ class Covid19Widget
 				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
 
 			var last_day_data = country_data[ country_data.length-1 ];
-			if (!last_day_data.confirmed)
+			if (!last_day_data.confirmed && (country_data.length > 1))
 				last_day_data = country_data[ country_data.length-2 ];
 			var total_infected = last_day_data.confirmed * asymp_ratio;
 			var total_infected_percent = 0;
