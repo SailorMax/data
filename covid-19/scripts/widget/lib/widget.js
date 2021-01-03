@@ -1571,6 +1571,7 @@ class Covid19Widget
 			var country_color = {};
 			var labels = [];
 			var countries_data = {};
+			var min_per100k = -1;
 			var max_per100k = 0;
 
 			for (var country_name of country_names)
@@ -1592,13 +1593,20 @@ class Covid19Widget
 				var local_max_per100k = Covid19DataTools.GetMaxValueFromData(countries_data[ country_name ], "per100k");
 				if (max_per100k < local_max_per100k)
 					max_per100k = local_max_per100k;
+
+				var local_min_per100k = Covid19DataTools.GetMinValueFromData(countries_data[ country_name ], "per100k");
+				if ((min_per100k > local_min_per100k) || (min_per100k == -1))
+					min_per100k = local_min_per100k;
 			}
 			//
+
+			if (min_per100k == -1)
+				min_per100k = 0;
 
 			// axis
 			var x_scale = d3.scaleBand(self.data.GetDaysListFromData(countries_data[base_country]), [self.margin.left, self.width - self.margin.left]).paddingInner(0.5).paddingOuter(0.5);
 //			var y_scale = d3.scaleLinear([Math.ceil(max_per100k*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]);
-			var y_scale = d3.scaleSymlog([Math.ceil(max_per100k*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]).constant(30);
+			var y_scale = d3.scaleSymlog([Math.ceil(max_per100k*1.3), min_per100k*0.7], [0, self.height-self.margin.top-self.margin.bottom]).constant(30);
 			funcDrawAxis(x_scale, y_scale);
 			//
 
