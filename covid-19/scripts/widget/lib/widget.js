@@ -58,6 +58,14 @@ class Covid19Widget
 
 		this.PrepareTooltips();
 		this.LoadDataAsync(myPath).then( ()=>self.InitFirstForm() );
+		window.addEventListener("pageshow", (event) => {
+			if (event.persisted && self.d3_global_box)
+			{
+				self.d3_global_box.parentNode.removeChild(self.d3_global_box);
+				delete self.d3_global_box;
+				self.LoadDataAsync(myPath).then( ()=>self.InitFirstForm() );
+			}
+		});
 	}
 
 	PrepareTooltips()
@@ -208,7 +216,7 @@ class Covid19Widget
 				box.classList.add("collapsed");
 		};
 
-		this.d3_global_box = d3.create("DIV").attr("class", "Cv19SMW")
+		this.d3_global_box = d3.create("DIV").attr("class", "Cv19SMW");
 			let d3_preface = d3.create("DIV").attr("class", "preface collapsed");
 			d3_preface.append("A")
 						.on("click", ShowHideDescription)
