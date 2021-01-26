@@ -1653,7 +1653,7 @@ class Covid19Widget
 
 			for (var values_group of last_value_groups)
 			{
-				var values_output = values_group.values.join(",");
+				var values_output = [...new Set(values_group.values)].join(",");	// unique values
 				if (values_output.length > 10)
 				{
 					values_output = values_output.substr(0, 9);
