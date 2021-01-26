@@ -1702,7 +1702,7 @@ class Covid19Widget
 		};
 
 		var compare_country_names = box["myComparesList"] || [];
-		var funcCompareWith = function(init)
+		var funcCompareWith = function(event)
 		{
 			if (this.value != "")
 			{
@@ -1714,7 +1714,7 @@ class Covid19Widget
 			funcDrawCompareData(compare_country_names);
 
 			box["myComparesList"] = compare_country_names;
-			if (!init)
+			if (event)
 				self.StoreCountriesListCfg();
 		};
 
@@ -1767,7 +1767,7 @@ class Covid19Widget
 				d3_compareCountry.property("value", "");
 		}
 		box["myPreviousBaseName"] = base_country;
-		funcCompareWith.call(d3_compareCountry.node(), true);
+		funcCompareWith.call(d3_compareCountry.node());
 
 
 		// attach element to DOM
