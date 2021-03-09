@@ -1,6 +1,6 @@
 <?
-set_time_limit(900);					// script timeout
-ini_set('default_socket_timeout', 900);	// loader timeout
+set_time_limit(1200);						// script timeout
+ini_set('default_socket_timeout', 1200);	// loader timeout
 
 chdir(__DIR__);
 
@@ -327,10 +327,18 @@ class COVID19DATA
 				if (isset($this->new_data[$data_key]["timeline"][$date]))
 				{
 					$new_data_row =& $this->new_data[$data_key]["timeline"][$date];
-					if (((isset($new_data_row["tested"]) && ($new_data_row["tested"] == $day_data["tested"])) || (empty($new_data_row["tested"]) && !$day_data["tested"]))
-						&& ((isset($new_data_row["confirmed"]) && ($new_data_row["confirmed"] == $day_data["confirmed"])) || (empty($new_data_row["confirmed"]) && !$day_data["confirmed"]))
-						&& ((isset($new_data_row["recovered"]) && ($new_data_row["recovered"] == $day_data["recovered"])) || (empty($new_data_row["recovered"]) && !$day_data["recovered"]))
-						&& ((isset($new_data_row["deaths"]) && ($new_data_row["deaths"] == $day_data["deaths"])) || (empty($new_data_row["deaths"]) && !$day_data["deaths"]))
+					if (((isset($new_data_row["tested"]) && isset($day_data["tested"]) && ($new_data_row["tested"] == $day_data["tested"]))
+							|| (empty($new_data_row["tested"]) && empty($day_data["tested"]))
+							)
+						&& ((isset($new_data_row["confirmed"]) && isset($day_data["confirmed"]) && ($new_data_row["confirmed"] == $day_data["confirmed"]))
+							|| (empty($new_data_row["confirmed"]) && empty($day_data["confirmed"]))
+							)
+						&& ((isset($new_data_row["recovered"]) && isset($day_data["recovered"]) && ($new_data_row["recovered"] == $day_data["recovered"]))
+							|| (empty($new_data_row["recovered"]) && empty($day_data["recovered"]))
+							)
+						&& ((isset($new_data_row["deaths"]) && isset($day_data["deaths"]) && ($new_data_row["deaths"] == $day_data["deaths"]))
+							|| (empty($new_data_row["deaths"]) && empty($day_data["deaths"]))
+							)
 						)
 					{
 						unset($this->new_data[$data_key]["timeline"][$date]);
@@ -401,11 +409,11 @@ class COVID19DATA
 
 			if ($region_row)
 			{
-				if ($new_region["population"] && ($region_row["population"] != $new_region["population"]))
+				if (!empty($new_region["population"]) && (empty($region_row["population"]) || ($region_row["population"] != $new_region["population"])))
 					$region_row["population"] = $new_region["population"];
-				if ($new_region["country_iso"] && !$region_row["country_iso"])
+				if (!empty($new_region["country_iso"]) && empty($region_row["country_iso"]))
 					$region_row["country_iso"] = $new_region["country_iso"];
-				if ($new_region["region_iso"] && !$region_row["region_iso"])
+				if (!empty($new_region["region_iso"]) && empty($region_row["region_iso"]))
 					$region_row["region_iso"] = $new_region["region_iso"];
 
 				foreach ($new_region["timeline"] as $date => $data)
@@ -446,6 +454,7 @@ class COVID19DATA
 		foreach ($code_population as $iso => $population)
 		{
 			unset($old_values);
+			$old_values = null;
 			if (isset($old_code_population[$iso]))
 				$old_values = &$old_code_population[$iso];
 			else if (isset($this->regions[$iso]))			// pseudo countries (ships)
@@ -495,8 +504,12 @@ class COVID19DATA
 						"Veteran Hospitals",
 						"Federal Bureau of Prisons",
 						"US Military",
+
+						// pseudo regions
+						"Repatriated Travellers",
 						);
 
+		$broken_regions = array();
 		foreach ($this->regions as $region)
 		{
 			if (!$region["country_iso"] || !$region["population"] || ($region["region_name"] && !$region["region_iso"]))
@@ -536,10 +549,10 @@ class COVID19DATA
 					$regions[$data_key] = $new_region;
 				}
 				$regions[$data_key]["timeline"][ $date ] = array(
-																		"tested"	=> $day_stat["tested"],
-																		"confirmed"	=> $day_stat["confirmed"],
-																		"recovered"	=> $day_stat["recovered"],
-																		"deaths"	=> $day_stat["deaths"]
+																		"tested"	=> !empty($day_stat["tested"]) ? $day_stat["tested"] : 0,
+																		"confirmed"	=> !empty($day_stat["confirmed"]) ? $day_stat["confirmed"] : 0,
+																		"recovered"	=> !empty($day_stat["recovered"]) ? $day_stat["recovered"] : 0,
+																		"deaths"	=> !empty($day_stat["deaths"]) ? $day_stat["deaths"] : 0
 																		);
 				$dates[ $date ] = 1;
 			}

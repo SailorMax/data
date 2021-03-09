@@ -31,14 +31,20 @@ foreach ($ru_names_list as $item)
 }
 
 
+$ts = time();
 $file_data = file_get_contents("https://coronavirus-monitor.ru/jquery-lite-9.js");
-$pos = strpos($file_data, "{");
-$file_data = substr($file_data, $pos);
-$json_data = json_decode($file_data, true);
-unset($file_data);
+if (!empty($file_data))
+{
+	$pos = strpos($file_data, "{");
+	$file_data = substr($file_data, $pos);
+	$json_data = json_decode($file_data, true);
+	unset($file_data);
 
-if (!$json_data || !isset($json_data["russianSubjects"]["data"]["subjects"]))
-	trigger_error("COVID-19 loader(RUS): Loaded content is broken!", E_USER_ERROR);
+	if (!$json_data || !isset($json_data["russianSubjects"]["data"]["subjects"]))
+		trigger_error("COVID-19 loader(RUS): Loaded content is broken!" . (!empty($json_data) ? " (changed format?)" : (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : "")), E_USER_ERROR);
+}
+else
+	trigger_error("COVID-19 loader(RUS): Loaded content is empty!" . (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : ""), E_USER_ERROR);
 
 $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts) use (&$REGION_CODE, &$ru_names, &$fix_en_names)
 {

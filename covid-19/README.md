@@ -18,4 +18,4 @@ OR
 ```
 [Example](https://sailormax.github.io/data/covid-19/scripts/widget.html)
 
-[Пример моей странички](https://covid-19.sailormax.net/)
+[Пример странички](https://covid-19.sailormax.net/)

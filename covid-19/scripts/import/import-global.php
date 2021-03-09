@@ -92,6 +92,8 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 					$region_iso = $REGION_CODE[$country_iso][ $region_name ];
 				else if (isset($JHU_CSSE_names["regions"][$country_iso][ $region_name ]))
 					$region_iso = $JHU_CSSE_names["regions"][$country_iso][ $region_name ];
+				else if (isset($JHU_CSSE_names["countries"][ $region_name ]))					// some regions can be as country. Sample: Saint Helena, Ascension and Tristan da Cunha
+					$country_iso = $JHU_CSSE_names["countries"][ $region_name ];
 				else
 					trigger_error("Unknown region ({$country_iso}): ".$region_name , E_USER_WARNING);
 			}

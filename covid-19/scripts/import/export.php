@@ -17,15 +17,15 @@ if ($broken_regions)
 		if (!$region_row["country_iso"])
 			$details[] = "Country '".$region_row["country_name"]."' has not ISO!";
 		if ($region_row["region_name"] && !$region_row["region_iso"])
-			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".$region_row["region_name_source"].") has no ISO!";
+			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".(isset($region_row["region_name_source"]) ? $region_row["region_name_source"] : "").") has no ISO!";
 		if (!$region_row["population"])
-			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".$region_row["region_name_source"].") has no population!";
+			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".(isset($region_row["region_name_source"]) ? $region_row["region_name_source"] : "").") has no population!";
 	}
 
 	$email_args = array(
 					"to"			=> "sailormax@live.com",
 					"subject"		=> "covid-19: broken regions!",
-					"body"			=> "Regions has broken values: " . $COVID19DATA->DB_QUERY . "\n\nDetails:\n".implode("\n", $details),
+					"body"			=> "Regions has broken values:\n".implode("\n", $details)."\n",
 					);
 	mail($email_args["to"], $email_args["subject"], $email_args["body"]);
 	trigger_error($email_args["body"], E_USER_WARNING);
