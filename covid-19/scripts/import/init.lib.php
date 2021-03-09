@@ -1,6 +1,6 @@
 <?
-set_time_limit(1200);						// script timeout
-ini_set('default_socket_timeout', 1200);	// loader timeout
+set_time_limit(1800);						// script timeout
+ini_set('default_socket_timeout', 1800);	// loader timeout
 
 chdir(__DIR__);
 
@@ -145,7 +145,7 @@ class COVID19DATA
 
 		ksort($this->regions);
 
-		foreach ($this->regions as $region_key => $region)
+		foreach ($this->regions as $region)
 		{
 			foreach ($region["timeline"] as $date => $day_stat)
 			{
@@ -285,7 +285,7 @@ class COVID19DATA
 
 	function SyncAndReduceNewData($country_name = null)
 	{
-		$yesterday = date("Y-m-d", strtotime("yesterday"));
+//		$yesterday = date("Y-m-d", strtotime("yesterday"));
 		$zero_starts = array();
 
 		foreach ($this->regions as $data_key => $region)
@@ -450,7 +450,7 @@ class COVID19DATA
 				$old_code_population[$iso] = &$region;
 		}
 
-		$switch = array();
+//		$switch = array();
 		$old_values = null;
 		foreach ($code_population as $iso => $population)
 		{
@@ -525,8 +525,6 @@ class COVID19DATA
 
 	function ExportDataToCsv($target_file_path, $ts_limiter = 0, $country_name = null, $value_type = null, $export_fields = null)
 	{
-		global $MEL, $MEL_CONF, $FILE;
-
 		// get fresh data
 		$dates = array();
 		$regions = array();
