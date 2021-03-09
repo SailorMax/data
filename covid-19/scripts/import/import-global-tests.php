@@ -67,13 +67,12 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 		$as_new_country = false;
 		$region_name = null;
 		$region_iso = null;
-		$country_key = $country_name.":".$country_iso;
 
 		if (isset($CONVERT_CODES[$country_key]))
 		{
 			$country_iso = $CONVERT_CODES[$country_key]["country_iso"];
 			$region_iso = $CONVERT_CODES[$country_key]["region_iso"];
-			if ($country_iso == "-" && $region_iso == "-")
+			if (($country_iso == "-") && ($region_iso == "-"))
 				continue;
 
 			$country_key = $country_name.":".$country_iso.":".$region_iso;

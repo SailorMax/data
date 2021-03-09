@@ -14,11 +14,11 @@ if ($broken_regions)
 	$details = array();
 	foreach ($broken_regions as $region_row)
 	{
-		if (!$region_row["country_iso"])
+		if (empty($region_row["country_iso"]))
 			$details[] = "Country '".$region_row["country_name"]."' has not ISO!";
-		if ($region_row["region_name"] && !$region_row["region_iso"])
+		if (!empty($region_row["region_name"]) && empty($region_row["region_iso"]))
 			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".(isset($region_row["region_name_source"]) ? $region_row["region_name_source"] : "").") has no ISO!";
-		if (!$region_row["population"])
+		if (empty($region_row["population"]))
 			$details[] = "Region '".$region_row["country_name"]." / ".$region_row["region_name"]."' (".(isset($region_row["region_name_source"]) ? $region_row["region_name_source"] : "").") has no population!";
 	}
 

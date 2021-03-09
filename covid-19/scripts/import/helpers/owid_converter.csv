@@ -1,14 +1,26 @@
 source_iso,source_name,country_iso,region_iso,comment
-BQ,Bonaire Sint Eustatius and Saba,NL,NL-BQ,
-CW,Curacao,NL,NL-CW,
-FK,Falkland Islands,GB,FK-FK,
-FO,Faeroe Islands,DK,FO-FO,
-GU,Guam,US,US-GU,
-HK,Hong Kong,CN,CN-91,
-IM,Isle of Man,GB,GB-IOM,
-JE,Jersey,JE,,
-MP,Northern Mariana Islands,US,US-MP,
-PR,Puerto Rico,US,US-PR,
-SX,Sint Maarten (Dutch part),-,-,Not sure where to put it
-VI,United States Virgin Islands,US,US-VI,
+BES,Bonaire Sint Eustatius and Saba,NL,NL-BQ,
+CUW,Curacao,NL,NL-CW,
+FLK,Falkland Islands,GB,FK-FK,
+FRO,Faeroe Islands,DK,FO-FO,
+GUM,Guam,US,US-GU,
+HKG,Hong Kong,CN,CN-91,
+IMN,Isle of Man,GB,GB-IOM,
+JEY,Jersey,JE,,
+MNP,Northern Mariana Islands,US,US-MP,
+PRI,Puerto Rico,US,US-PR,
+SXM,Sint Maarten (Dutch part),-,-,Not sure where to put it
+VIR,United States Virgin Islands,US,US-VI,
 OWID_KOS,Kosovo,XK,,
+OWID_SAM,South America,-,-,group of countries
+OWID_OCE,Oceania,-,-,group of countries
+OWID_EUN,European Union,-,-,group of countries
+OWID_EUR,Europe,-,-,group of countries
+OWID_AFR,Africa,-,-,group of countries
+OWID_ASI,Asia,-,-,group of countries
+OWID_NAM,North America,-,-,group of countries
+OWID_CIS,Channel Islands,-,-,group of countries
+OWID_MNS,Melanesia,-,-,group of countries
+OWID_PYA,Polynesia,-,-,group of countries
+OWID_WRL,World,-,-,group of countries
+OWID_INT,International,-,-,group of countries

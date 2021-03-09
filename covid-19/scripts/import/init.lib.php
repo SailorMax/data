@@ -160,9 +160,9 @@ class COVID19DATA
 			$lists["country_iso"][]		= $region["country_iso"];
 			$lists["region_name"][]		= $region["region_name"];
 			$lists["region_iso"][]		= $region["region_iso"];
-			$lists["lat"][]				= $region["lat"];
-			$lists["long"][]			= $region["long"];
-			$lists["population"][]		= $region["population"];
+			$lists["lat"][]				= (isset($region["lat"]) ? $region["lat"] : "");
+			$lists["long"][]			= (isset($region["long"]) ? $region["long"] : "");
+			$lists["population"][]		= (isset($region["population"]) ? $region["population"] : "");
 		}
 
 		// country name
@@ -383,8 +383,9 @@ class COVID19DATA
 		foreach ($this->new_data as $new_region)
 		{
 			unset($region_row);
+			$region_row = null;
 			$region_key = $new_region["country_name"]."/".$new_region["region_name"];
-			if ($this->regions[ $region_key ])
+			if (!empty($this->regions[ $region_key ]))
 			{
 				$region_row = &$this->regions[ $region_key ];
 			}
@@ -460,7 +461,7 @@ class COVID19DATA
 			else if (isset($this->regions[$iso]))			// pseudo countries (ships)
 				$old_values = &$this->regions[$iso];
 
-			if ($old_values && $population && ($old_values["population"] != $population))
+			if ($old_values && $population && (empty($old_values["population"]) || ($old_values["population"] != $population)))
 				$old_values["population"] = $population;
 		}
 	}
@@ -477,7 +478,7 @@ class COVID19DATA
 			$zero_days = array();
 			foreach ($region["timeline"] as $date => $stat_row)
 			{
-				if (!$stat_row["tested"] && !$stat_row["confirmed"] && !$stat_row["recovered"] && !$stat_row["deaths"])
+				if (empty($stat_row["tested"]) && empty($stat_row["confirmed"]) && empty($stat_row["recovered"]) && empty($stat_row["deaths"]))
 					$zero_days[] = $date;
 				else
 				{
@@ -512,7 +513,7 @@ class COVID19DATA
 		$broken_regions = array();
 		foreach ($this->regions as $region)
 		{
-			if (!$region["country_iso"] || !$region["population"] || ($region["region_name"] && !$region["region_iso"]))
+			if (empty($region["country_iso"]) || empty($region["population"]) || (!empty($region["region_name"]) && empty($region["region_iso"])))
 			{
 				if (in_array($region["country_name"], $exceptions) || in_array($region["region_name"], $exceptions))
 					continue;
@@ -596,15 +597,20 @@ class COVID19DATA
 			$row = array();
 			foreach ($export_fields as $field_name => $field_title)
 			{
-				if ($field_name == "lat" || $field_name == "long")
+				if (isset($region[$field_name]))
 				{
-					$val = rtrim($region[$field_name], "0");
-					if (substr($val, strlen($val)-1) == ".")
-						$val .= "0";
-					$row[] = $val;
+					if ($field_name == "lat" || $field_name == "long")
+					{
+						$val = rtrim($region[$field_name], "0");
+						if (substr($val, strlen($val)-1) == ".")
+							$val .= "0";
+						$row[] = $val;
+					}
+					else
+						$row[] = $region[$field_name];
 				}
 				else
-					$row[] = $region[$field_name];
+					$row[] = "";
 			}
 
 			$region_timeline = $region["timeline"];
