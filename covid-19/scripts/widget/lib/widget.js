@@ -72,7 +72,7 @@ class Covid19Widget
 	{
 		// tooltips
 		var single_tooltip = new Covid19SingleTooltip();
-		this.ShowHideHint = function(data, idx, els_list)
+		this.ShowHideHint = function(event, data, idx, els_list)
 		{
 			single_tooltip.ShowHideHint(this, data, idx, els_list);
 			event.stopPropagation();
