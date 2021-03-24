@@ -37,7 +37,8 @@ class Covid19SingleTooltip
 			sender_coords.width += 6;
 			sender_coords.x -= 3;
 			//
-			title = data;
+//			title = data;
+			title = d3.select(sender).select("title").text();
 		}
 		else if ((els_list.length > 1) && (els_list[0].tagName == "rect") && d3.select(els_list[0]).attr("x") == d3.select(els_list[1]).attr("x")) // multiple bars
 		{
