@@ -41,10 +41,10 @@ if (!empty($file_data))
 	unset($file_data);
 
 	if (!$json_data || !isset($json_data["russianSubjects"]["data"]["subjects"]))
-		trigger_error("COVID-19 loader(RUS): Loaded content is broken!" . (!empty($json_data) ? " (changed format?)" : (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : "")), E_USER_ERROR);
+		trigger_error("COVID-19 loader(RUS): Loaded content is broken!" . (!empty($json_data) ? " (changed format?)" : (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : "")), E_USER_WARNING);
 }
 else
-	trigger_error("COVID-19 loader(RUS): Loaded content is empty!" . (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : ""), E_USER_ERROR);
+	trigger_error("COVID-19 loader(RUS): Loaded content is empty!" . (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : ""), E_USER_WARNING);
 
 $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts) use (&$REGION_CODE, &$ru_names, &$fix_en_names)
 {
@@ -117,5 +117,6 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 	}
 };
 
-$COVID19DATA->ImportData($json_data, $funcCollectNewData, $DATA_COUNTRY_NAME);
+if ($file_data)
+	$COVID19DATA->ImportData($json_data, $funcCollectNewData, $DATA_COUNTRY_NAME);
 ?>
