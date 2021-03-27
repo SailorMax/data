@@ -32,6 +32,7 @@ foreach ($ru_names_list as $item)
 
 
 $ts = time();
+$json_data = null;
 $file_data = file_get_contents("https://coronavirus-monitor.ru/jquery-lite-9.js");
 if (!empty($file_data))
 {
@@ -117,6 +118,6 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 	}
 };
 
-if ($file_data)
+if ($json_data)
 	$COVID19DATA->ImportData($json_data, $funcCollectNewData, $DATA_COUNTRY_NAME);
 ?>
