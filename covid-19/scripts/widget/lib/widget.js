@@ -634,6 +634,7 @@ class Covid19Widget
 			var last_day_data = country_data[ country_data.length-1 ];
 			if (!last_day_data.confirmed && (country_data.length > 1))
 				last_day_data = country_data[ country_data.length-2 ];
+
 			var total_infected = last_day_data.confirmed * asymp_ratio;
 			var total_infected_percent = 0;
 			if (population > 0)
@@ -642,6 +643,20 @@ class Covid19Widget
 			d3_box.select(".total_infected TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≥ " : "") + (total_infected_percent ? total_infected_percent : total_infected) )
 				.attr("title", (total_infected_percent ? total_infected : ""));
+
+			var vaccined = last_day_data.vaccined * asymp_ratio;
+			if (vaccined > 0)
+			{
+				var vaccined_percent = 0;
+				if (population > 0)
+					vaccined_percent = Covid19DataTools.GetFormattedNumber(Math.round((vaccined / population)*100000)/1000, true) + "%";
+				vaccined = Covid19DataTools.GetFormattedNumber(vaccined, true);
+				d3_box.select(".vaccined TD:nth-child(2)")
+					.text( (vaccined_percent ? vaccined_percent : vaccined) )
+					.attr("title", (vaccined_percent ? vaccined : ""));
+			}
+			else	// no vaccines => no data row
+				d3_box.select(".vaccined").style("display", "none");
 
 			box["myCalcDays"] = calc_days;	// remember for country switch
 			box["myScale"] = scale;
@@ -773,6 +788,14 @@ class Covid19Widget
 			.attr("class", "total_infected")
 			.append("td")
 				.text( this.WORDS["total_infected"].charAt(0).toUpperCase() + this.WORDS["total_infected"].slice(1) )
+			.select(function(){ return this.parentNode; })
+			.append("td");
+
+		// vaccined
+		d3_table.append("tr")
+			.attr("class", "vaccined")
+			.append("td")
+				.text( this.WORDS["vaccined"].charAt(0).toUpperCase() + this.WORDS["vaccined"].slice(1) )
 			.select(function(){ return this.parentNode; })
 			.append("td");
 

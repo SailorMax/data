@@ -56,6 +56,7 @@ $JHU_CSSE_fields = array(
 						"lat"			=> "Lat",
 						"long"			=> "Long",
 						);
+$COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_vaccined_global.csv", 0, null, "vaccined", $JHU_CSSE_fields);
 $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_tested_global.csv", 0, null, "tested", $JHU_CSSE_fields);
 $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_confirmed_global.csv", 0, null, "confirmed", $JHU_CSSE_fields);
 $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_recovered_global.csv", 0, null, "recovered", $JHU_CSSE_fields);

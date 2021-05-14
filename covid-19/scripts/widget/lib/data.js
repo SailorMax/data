@@ -30,7 +30,7 @@ class Covid19Data
 		this.use_last_x_days = use_last_x_days;
 
 		this.ms_in_day = 24*60*60*1000;
-		this.value_field_names = ["tested", "confirmed", "recovered", "deaths"];
+		this.value_field_names = ["vaccined", "tested", "confirmed", "recovered", "deaths"];
 
 		// will be filled later
 		this.countries = [];
@@ -414,6 +414,7 @@ class Covid19Data
 							}
 
 							// collect required data
+							var prev_crd = [0, 0, 0, 0, 0];
 							for (var key of require_cols)
 							{
 								var ts = key.ts;
@@ -424,20 +425,34 @@ class Covid19Data
 								{
 									// my format
 									var crd = row[key.name].split("/");
-									if (crd.length > 3)
+									if (crd.length > 4)
 									{
-										country.timeline[ts]["tested"] = crd[0]-0;
-										country.timeline[ts]["confirmed"] = crd[1]-0;
-										country.timeline[ts]["recovered"] = crd[2]-0;
-										country.timeline[ts]["deaths"] = crd[3]-0;
+										// inherit `vaccined` from previous day if current is empty
+										if (crd[0]-0 == 0)
+											crd[0] = prev_crd[0];
+
+										country.timeline[ts]["vaccined"]	= crd[0]-0;
+										country.timeline[ts]["tested"]		= crd[1]-0;
+										country.timeline[ts]["confirmed"]	= crd[2]-0;
+										country.timeline[ts]["recovered"]	= crd[3]-0;
+										country.timeline[ts]["deaths"]		= crd[4]-0;
+									}
+									// back compatibility
+									else if (crd.length > 3)
+									{
+										country.timeline[ts]["tested"]		= crd[0]-0;
+										country.timeline[ts]["confirmed"]	= crd[1]-0;
+										country.timeline[ts]["recovered"]	= crd[2]-0;
+										country.timeline[ts]["deaths"]		= crd[3]-0;
 									}
 									else
 									{
-										// back compatibility
-										country.timeline[ts]["confirmed"] = crd[0]-0;
-										country.timeline[ts]["recovered"] = crd[1]-0;
-										country.timeline[ts]["deaths"] = crd[2]-0;
+										country.timeline[ts]["confirmed"]	= crd[0]-0;
+										country.timeline[ts]["recovered"]	= crd[1]-0;
+										country.timeline[ts]["deaths"]		= crd[2]-0;
 									}
+
+									prev_crd = crd;
 								}
 								else
 									country.timeline[ts][data_name] = row[key.name]-0;

@@ -9,7 +9,7 @@ include("import-us.php");
 print "> Import RU data\n";
 include("import-ru.php");
 
-print "> Import tests data\n";
+print "> Import vaccined/tests data\n";
 include("import-global-tests.php");
 
 // try to fix bad data and old data (refreshed population)

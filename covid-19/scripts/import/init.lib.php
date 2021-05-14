@@ -174,7 +174,7 @@ class COVID19DATA
 		fputcsv($fp, $lists["long"]);
 		fputcsv($fp, $lists["population"]);
 
-		$data_types = array("tested", "confirmed", "recovered", "deaths");
+		$data_types = array("vaccined", "tested", "confirmed", "recovered", "deaths");
 		for ($dt = $min_date; $dt <= $max_date; $dt += 60*60*24)
 		{
 			$row_date = date("Y-m-d", $dt);
@@ -327,7 +327,10 @@ class COVID19DATA
 				if (isset($this->new_data[$data_key]["timeline"][$date]))
 				{
 					$new_data_row =& $this->new_data[$data_key]["timeline"][$date];
-					if (((isset($new_data_row["tested"]) && isset($day_data["tested"]) && ($new_data_row["tested"] == $day_data["tested"]))
+					if (((isset($new_data_row["vaccined"]) && isset($day_data["vaccined"]) && ($new_data_row["vaccined"] == $day_data["vaccined"]))
+							|| (empty($new_data_row["vaccined"]) && empty($day_data["vaccined"]))
+							)
+						&& ((isset($new_data_row["tested"]) && isset($day_data["tested"]) && ($new_data_row["tested"] == $day_data["tested"]))
 							|| (empty($new_data_row["tested"]) && empty($day_data["tested"]))
 							)
 						&& ((isset($new_data_row["confirmed"]) && isset($day_data["confirmed"]) && ($new_data_row["confirmed"] == $day_data["confirmed"]))
@@ -375,7 +378,7 @@ class COVID19DATA
 
 	function StoreNewDataToDatabase()
 	{
-		$update_stat_fields = array("tested", "confirmed", "recovered", "deaths");
+		$update_stat_fields = array("vaccined", "tested", "confirmed", "recovered", "deaths");
 
 		$updated_regions = array();
 		$region_row = null;
@@ -478,7 +481,7 @@ class COVID19DATA
 			$zero_days = array();
 			foreach ($region["timeline"] as $date => $stat_row)
 			{
-				if (empty($stat_row["tested"]) && empty($stat_row["confirmed"]) && empty($stat_row["recovered"]) && empty($stat_row["deaths"]))
+				if (empty($stat_row["vaccined"]) && empty($stat_row["tested"]) && empty($stat_row["confirmed"]) && empty($stat_row["recovered"]) && empty($stat_row["deaths"]))
 					$zero_days[] = $date;
 				else
 				{
@@ -548,11 +551,12 @@ class COVID19DATA
 					$regions[$data_key] = $new_region;
 				}
 				$regions[$data_key]["timeline"][ $date ] = array(
-																		"tested"	=> !empty($day_stat["tested"]) ? $day_stat["tested"] : 0,
-																		"confirmed"	=> !empty($day_stat["confirmed"]) ? $day_stat["confirmed"] : 0,
-																		"recovered"	=> !empty($day_stat["recovered"]) ? $day_stat["recovered"] : 0,
-																		"deaths"	=> !empty($day_stat["deaths"]) ? $day_stat["deaths"] : 0
-																		);
+																"vaccined"	=> !empty($day_stat["vaccined"]) ? $day_stat["vaccined"] : 0,
+																"tested"	=> !empty($day_stat["tested"]) ? $day_stat["tested"] : 0,
+																"confirmed"	=> !empty($day_stat["confirmed"]) ? $day_stat["confirmed"] : 0,
+																"recovered"	=> !empty($day_stat["recovered"]) ? $day_stat["recovered"] : 0,
+																"deaths"	=> !empty($day_stat["deaths"]) ? $day_stat["deaths"] : 0
+																);
 				$dates[ $date ] = 1;
 			}
 		}
@@ -624,7 +628,9 @@ class COVID19DATA
 				else	// merged
 				{
 					if (isset($region_timeline[$date]))
-						$row[] = ($region_timeline[$date]["tested"] ?: 0)
+						$row[] = ($region_timeline[$date]["vaccined"] ?: 0)
+									. "/"
+									. ($region_timeline[$date]["tested"] ?: 0)
 									. "/"
 									. ($region_timeline[$date]["confirmed"] ?: 0)
 									. "/"
@@ -632,7 +638,7 @@ class COVID19DATA
 									. "/"
 									. ($region_timeline[$date]["deaths"] ?: 0);
 					else
-						$row[] = "0/0/0/0";
+						$row[] = "0/0/0/0/0";
 				}
 			}
 

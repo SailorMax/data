@@ -29,15 +29,16 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 	$new_countries = array();
 	$renamed_countries = array();
 	$data_fields = array(
-					"total_tests"	=> "tested",
-					"total_cases"	=> "confirmed",
-					"total_deaths"	=> "deaths",
+					"total_tests"		=> "tested",
+					"total_cases"		=> "confirmed",
+					"total_deaths"		=> "deaths",
+					"people_vaccinated"	=> "vaccined",
 					);
 
 	// collect
 	foreach ($import_csv as $region_day)
 	{
-		if (!$region_day["iso_code"] || ($region_day["iso_code"] == "OWID_WRL"))	// Pseudo countries (International, World)
+		if (!$region_day["iso_code"] || in_array($region_day["iso_code"], array("OWID_WRL", "OWID_HIC", "OWID_LIC", "OWID_LMC")))	// Pseudo countries (International, World,..)
 			continue;
 
 		$stat_ts = strtotime($region_day["date"]) - (60*60*24);	// this source has shifted date by 1 day ahead!
