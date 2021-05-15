@@ -658,7 +658,7 @@ class Covid19Widget
 			else	// no vaccines data
 			{
 				d3_box.select(".vaccined TD:nth-child(2)")
-					.text( this.WORDS["unknown"] );
+					.text( self.WORDS["unknown"] );
 			}
 
 			box["myCalcDays"] = calc_days;	// remember for country switch
