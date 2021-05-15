@@ -37,6 +37,7 @@
 		"total_infected":	"total infected",
 
 		"vaccined":			"vaccined",
+		"unknown":			"unknown",
 
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",

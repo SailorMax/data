@@ -655,8 +655,11 @@ class Covid19Widget
 					.text( (vaccined_percent ? vaccined_percent : vaccined) )
 					.attr("title", (vaccined_percent ? vaccined : ""));
 			}
-			else	// no vaccines => no data row
-				d3_box.select(".vaccined").style("display", "none");
+			else	// no vaccines data
+			{
+				d3_box.select(".vaccined TD:nth-child(2)")
+					.text( this.WORDS["unknown"] );
+			}
 
 			box["myCalcDays"] = calc_days;	// remember for country switch
 			box["myScale"] = scale;
