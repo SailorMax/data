@@ -644,7 +644,7 @@ class Covid19Widget
 				.text( (use_asymptomatic ? "≥ " : "") + (total_infected_percent ? total_infected_percent : total_infected) )
 				.attr("title", (total_infected_percent ? total_infected : ""));
 
-			var vaccined = last_day_data.vaccined * asymp_ratio;
+			var vaccined = last_day_data.vaccined;
 			if (vaccined > 0)
 			{
 				var vaccined_percent = 0;
