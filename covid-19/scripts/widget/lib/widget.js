@@ -799,6 +799,10 @@ class Covid19Widget
 			.attr("class", "vaccined")
 			.append("td")
 				.text( this.WORDS["vaccined"].charAt(0).toUpperCase() + this.WORDS["vaccined"].slice(1) )
+				.append("SUP")
+					.append("A")
+					.attr("href", "#vaccined")
+					.call( (d3_sel) => d3_sel.node().appendChild( document.createTextNode("[6]") ) )
 			.select(function(){ return this.parentNode; })
 			.append("td");
 
