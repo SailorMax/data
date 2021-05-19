@@ -803,6 +803,8 @@ class Covid19Widget
 					.append("A")
 					.attr("href", "#vaccined")
 					.call( (d3_sel) => d3_sel.node().appendChild( document.createTextNode("[6]") ) )
+					.select(function(){ return this.parentNode; })
+				.select(function(){ return this.parentNode; })
 			.select(function(){ return this.parentNode; })
 			.append("td");
 
