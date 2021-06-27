@@ -629,7 +629,7 @@ class Covid19Widget
 			d3_box.select(".infected_per_x TD:nth-child(2)")
 				.text( (use_asymptomatic ? "≥ " : "") + Covid19DataTools.GetFormattedNumber( out_infected_per_x, true ) );
 			d3_box.select(".infected_1_per_x TD:nth-child(2)")
-				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( Math.floor(scale / (infected_per_x*asymp_ratio)), true ) );
+				.text( (use_asymptomatic ? "≤ " : "") + Covid19DataTools.GetFormattedNumber( infected_per_x ? Math.floor(scale / (infected_per_x*asymp_ratio)) : 0, true ) );
 
 			var last_day_data = country_data[ country_data.length-1 ];
 			if (!last_day_data.confirmed && (country_data.length > 1))
