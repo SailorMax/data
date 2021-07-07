@@ -82,26 +82,26 @@
 	let modules_list = [
 					// main modules
 					[
-						"d3-selection.v2",
-						"d3-dispatch.v2",
-						"d3-dsv.v2",
-						"d3-format.v2",
-						"d3-time-format.v3",
-						"d3-ease.v2",
+						"d3-selection.v3",
+						"d3-dispatch.v3",
+						"d3-dsv.v3",
+						"d3-format.v3",
+						"d3-time-format.v4",
+						"d3-ease.v3",
 					],
 					// with relations
 					[
-						"d3-fetch.v2",
-						"d3-axis.v2",
-						"d3-array.v2",
-						"d3-interpolate.v2",
-						"d3-scale.v3",
-						"d3-shape.v2",
-						"d3-path.v2",
+						"d3-fetch.v3",
+						"d3-axis.v3",
+						"d3-array.v3",
+						"d3-interpolate.v3",
+						"d3-scale.v4",
+						"d3-shape.v3",
+						"d3-path.v3",
 
-						"d3-timer.v2",
-						"d3-color.v2",
-						"d3-transition.v2",
+						"d3-timer.v3",
+						"d3-color.v3",
+						"d3-transition.v3",
 
 						// my modules
 						"./lib/widget.js",
