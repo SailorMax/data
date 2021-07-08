@@ -663,12 +663,12 @@ class Covid19Widget
 
 			var deaths = last_day_data.deaths;
 			var recovered = last_day_data.recovered;
-			var deaths_per_recovered = (deaths ? 100 : 0);
+			var deaths_per_recovered = "?";
 			if (recovered > 0)
 				deaths_per_recovered = Covid19DataTools.GetFormattedNumber(Math.round((deaths / (deaths+recovered))*100000)/1000, true);
 			d3_box.select(".deaths_per_recovered TD:nth-child(2)")
 				.text( deaths_per_recovered + "%" )
-				.attr("title", Covid19DataTools.GetFormattedNumber(deaths, true) + " / " + Covid19DataTools.GetFormattedNumber(recovered, true));
+				.attr("title", (deaths ? Covid19DataTools.GetFormattedNumber(deaths, true) : "?") + " / " + (recovered ? Covid19DataTools.GetFormattedNumber(recovered, true) : "?"));
 
 			box["myCalcDays"] = calc_days;	// remember for country switch
 			box["myScale"] = scale;
