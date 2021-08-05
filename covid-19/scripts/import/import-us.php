@@ -62,7 +62,10 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 			else if (isset($JHU_CSSE_names["regions"][$country_iso][ $region_name ]))
 				$region_iso = $JHU_CSSE_names["regions"][$country_iso][ $region_name ];
 			else
+			{
 				trigger_error("Unknown region: ".$region_name , E_USER_WARNING);
+				continue 2;
+			}
 
 			$data_key = $country_name."/".$region_name;
 			if (empty($new_data[ $data_key ]))

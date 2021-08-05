@@ -76,6 +76,10 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 			// skip fake records
 			if (($country_name == "Canada") && ($region_name == "Recovered"))
 				continue;
+			if (($country_name == "China") && ($region_name == "Unknown"))
+				continue;
+			if ($country_name == "Summer Olympics 2020")
+				continue;
 
 			$country_iso = null;
 			if (array_key_exists($country_name, $COUNTRY_CODE))
@@ -83,7 +87,10 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 			else if (isset($JHU_CSSE_names["countries"][ $country_name ]))
 				$country_iso = $JHU_CSSE_names["countries"][ $country_name ];
 			else
+			{
 				trigger_error("Unknown country: ".$country_name , E_USER_WARNING);
+				continue 2;
+			}
 
 			$region_iso = null;
 			if ($region_name)
@@ -99,7 +106,10 @@ $funcCollectNewData = function(&$new_data, &$import_csv, $values_name, $first_da
 					$region_name = "";
 				}
 				else
+				{
 					trigger_error("Unknown region ({$country_iso}): ".$region_name , E_USER_WARNING);
+					continue 2;
+				}
 			}
 
 			$data_key = $country_name."/".$region_name;
