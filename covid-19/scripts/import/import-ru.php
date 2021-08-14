@@ -2,87 +2,89 @@
 $DATA_COUNTRY_NAME = "Russia";	// using in init.lib.php
 include_once("init.lib.php");
 
-$REGION_CODE = array();
+$fix_service_codes = array(
+						// iso			service's
+						"RU-AL"		=> "RU-GA",		// Altayskaya respublika
+						"RU-43"		=> "RU-CR",		// Krim
+						"RU-TA"		=> "RU-TT",		// Tatarstan
+						"RU-40"		=> "RU-SEV",	// Sevatopolj
+						);
+$deprecated_codes = array(
+						"RU-AGB",
+						"RU-CHI",
+						"RU-EVE",
+						"RU-KOP",
+						"RU-KOR",
+						"RU-TAY",
+						"RU-UOB",
+						);
 
-$fix_en_names = array(
-					"Татарстан"					=> "Republic of Tatarstan",
-					"Ставропольский край"		=> "Stavropol Krai",
-					"Республика Коми"			=> "Komi Republic",
-					"Приморский край"			=> "Primorsky Krai",
-					"Липецкая область"			=> "Lipetsk Oblast",
-					"Кемеровская область"		=> "Kemerovo Oblast",
-					"Калининградская область"	=> "Kaliningrad Oblast",
-					"Брянская область"			=> "Bryansk Oblast",
-					"Белгородская область"		=> "Belgorod Oblast",
-					"Республика Алтай"			=> "Altai Republic",
-				);
+$REGION_EN_NAMES = array();
+$geo_dir = dirname(dirname(dirname(__DIR__))) . "/geo";
+$regions_list = $COVID19DATA->GetCsvDataByUri($geo_dir."/iso-3166-2.csv");
+foreach ($regions_list as $region)
+	$REGION_EN_NAMES[ $region["iso"] ] = $region["name"];
 
+$regions_list = $COVID19DATA->GetCsvDataByUri($geo_dir."/translates/regions/en.csv");
+foreach ($regions_list as $region)
+	$REGION_EN_NAMES[ $region["iso"] ] = $region["name"];
+
+$REGION_CODES = array();
 $ru_names_list = $COVID19DATA->GetCsvDataByUri(__DIR__."/helpers/rus_source_names.csv");
-$ru_names = array();
 foreach ($ru_names_list as $item)
 {
-	$iso = explode("-", $item["iso"]);
-	if (count($iso) == 1)
-		$ru_names["countries"][ $item["name"] ] = $iso[0];
+	if (!isset($REGION_EN_NAMES[ $item["iso"] ]))
+		trigger_error("COVID-19 pre-loader(".$item["iso"]."): Region is not available in iso-3166-2.csv!", E_USER_WARNING);
 	else
-		$ru_names["regions"][ $iso[0] ][ $item["name"] ] = $item["iso"];
-
-	$REGION_CODE[ $item["name"] ] = $item["iso"];
+		$REGION_CODES[ $item["iso"] ] = $REGION_EN_NAMES[ $item["iso"] ];
 }
-
 
 $ts = time();
-$json_data = null;
-$file_data = file_get_contents("https://coronavirus-monitor.ru/jquery-lite-9.js");
-if (!empty($file_data))
+$json_data = array();
+foreach ($REGION_CODES as $region_code => $region_name)
 {
-	$pos = strpos($file_data, "{");
-	$file_data = substr($file_data, $pos);
-	$json_data = json_decode($file_data, true);
-	unset($file_data);
+	if (in_array($region_code, $deprecated_codes))
+		continue;
 
-	if (!$json_data || !isset($json_data["russianSubjects"]["data"]["subjects"]))
-		trigger_error("COVID-19 loader(RUS): Loaded content is broken!" . (!empty($json_data) ? " (changed format?)" : (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : "")), E_USER_WARNING);
+	$service_region_code = $region_code;
+	if (isset($fix_service_codes[$region_code]))
+		$service_region_code = $fix_service_codes[$region_code];
+	$file_data = file_get_contents("https://xn--80aesfpebagmfblc0a.xn--p1ai/covid_data.json?do=region_stats&code=".$service_region_code);
+	if (!empty($file_data))
+	{
+		$local_json_data = json_decode($file_data, true);
+		unset($file_data);
+
+		if (!$local_json_data || !isset($local_json_data[0]["date"]))
+			trigger_error("COVID-19 loader(".$service_region_code."): Loaded content is broken or empty!" . (!empty($local_json_data) ? " (changed format?)" : (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : "")), E_USER_WARNING);
+		else
+		{
+			$json_data[$region_code] = $local_json_data;
+		}
+	}
+	else
+		trigger_error("COVID-19 loader(".$service_region_code."): Loaded content is empty!" . (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : ""), E_USER_WARNING);
+
+	// do not load too fast
+	sleep(5);
 }
-else
-	trigger_error("COVID-19 loader(RUS): Loaded content is empty!" . (abs(time()-$ts-ini_get('default_socket_timeout')) < 10 ? " (timeout?)" : ""), E_USER_WARNING);
 
-$funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts) use (&$REGION_CODE, &$ru_names, &$fix_en_names)
+$funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts) use (&$REGION_CODES)
 {
 	$today_ts = strtotime(date("Y-m-d"));
 	$value_types = array(
-		"confirmed"	=> "confirmed",
-		"cured"		=> "recovered",
-		"deaths"	=> "deaths",
+		"sick"		=> "confirmed",
+		"healed"	=> "recovered",
+		"died"		=> "deaths",
 	);
-
-	$russian_subjects = $import_data["russianSubjects"]["data"]["subjects"];
-	unset($import_data);
 
 	// collect new data
 	$new_data = array();
-	foreach ($russian_subjects as $region)
+	foreach ($import_data as $region_iso => $region_data)
 	{
-		$country_name = ($region["country"] == "Россия" ? "Russia" : "");
+		$country_name = "Russia";
 		$country_iso = "RU";
-		$region_name = trim($region["en"]);
-		$region_name_ru = trim($region["ru"]);
-
-		if ($region_name == $region_name_ru)
-		{
-			if (isset($fix_en_names[$region_name]))
-				$region_name = $fix_en_names[$region_name];
-			else
-				trigger_error("COVID-19: Region name looks like russian: ".$region_name, E_USER_ERROR);
-		}
-
-		$region_iso = null;
-		if (array_key_exists($region_name, $REGION_CODE))
-			$region_iso = $REGION_CODE[ $region_name ];
-		else if (isset($ru_names["regions"][$country_iso][ $region_name_ru ]))
-			$region_iso = $ru_names["regions"][$country_iso][ $region_name_ru ];
-		else
-			trigger_error("Unknown region: ".$region_name . "/".$region_name_ru, E_USER_WARNING);
+		$region_name = $REGION_CODES[$region_iso];
 
 		$data_key = $country_name."/".$region_name;
 		if (empty($new_data[ $data_key ]))
@@ -90,14 +92,12 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 										"country_name"	=> $country_name,
 										"country_iso"	=> $country_iso,
 										"region_name"	=> $region_name ?: null,
-										"region_name_source"=> (!$region_iso ? $region_name_ru : null),
+										"region_name_source"=> null,
 										"region_iso"	=> $region_iso,
-										"lat"			=> !$region["coordinates"][0] && !$region["coordinates"][1] ? null : $region["coordinates"][0],
-										"long"			=> !$region["coordinates"][0] && !$region["coordinates"][1] ? null : $region["coordinates"][1],
 										"timeline"		=> array()
 										);
 
-		foreach ($region["statistics"] as $stat)
+		foreach ($region_data as $stat)
 		{
 			$stat_ts = strtotime($stat["date"]);
 			$stat_date = date("Y-m-d", $stat_ts);
