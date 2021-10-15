@@ -39,7 +39,7 @@
 		"vaccined":			"vaccined",
 		"unknown":			"unknown",
 
-		"deaths_per_recovered":	"deaths per recovered",
+		"deaths_per_recovered":	"deaths per sick",
 
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",
