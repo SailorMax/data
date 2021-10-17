@@ -76,6 +76,7 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 		"sick"		=> "confirmed",
 		"healed"	=> "recovered",
 		"died"		=> "deaths",
+		"first"		=> "vaccined",
 	);
 
 	// collect new data
