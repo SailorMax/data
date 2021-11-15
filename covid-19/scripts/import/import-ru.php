@@ -113,6 +113,7 @@ $funcCollectNewData = function(&$new_data, &$import_data, $first_day_limiter_ts)
 //				if (isset($new_data[ $data_key ]["timeline"][$stat_date][$target_name]))
 //					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] += intval($stat[$src_name]);
 //				else
+				if (isset($stat[$src_name]))
 					$new_data[ $data_key ]["timeline"][$stat_date][$target_name] = intval($stat[$src_name]);
 			}
 		}
