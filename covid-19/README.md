@@ -4,6 +4,7 @@ Update time = 02:30, 05:30, 08:30, 11:30 UTC
 | ------------------------ | -------------- |
 | database.csv             | collected data |
 | 31days_covid19_merged_global.csv             | most actual data with all required info in format "vaccined/tested/confirmed/recovered/deaths" |
+| 18months_covid19_merged_global.csv           | grouped by month data with all required info in format "vaccined/tested/confirmed/recovered/deaths" |
 | time_series_covid19_confirmed_global.csv     | similar to Data Repository by Johns Hopkins CSSE, but with US states and Russian regions |
 | time_series_covid19_recovered_global.csv     | -//-  |
 | time_series_covid19_deaths_global.csv        | -//- |
