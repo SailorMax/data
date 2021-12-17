@@ -62,6 +62,8 @@ $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_confirmed_global
 $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_recovered_global.csv", 0, null, "recovered", $JHU_CSSE_fields);
 $COVID19DATA->ExportDataToCsv($export_dir."/time_series_covid19_deaths_global.csv", 0, null, "deaths", $JHU_CSSE_fields);
 
+$COVID19DATA->ExportGroupedDataToCsv($export_dir."/18months_covid19_merged_global.csv", "month", strtotime("-570 days"));
+
 /*
 // git push
 $out = "";

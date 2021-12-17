@@ -511,6 +511,7 @@ class COVID19DATA
 
 						// pseudo regions
 						"Repatriated Travellers",
+						"Summer Olympics 2020"
 						);
 
 		$broken_regions = array();
@@ -526,71 +527,11 @@ class COVID19DATA
 		return $broken_regions;
 	}
 
-	function ExportDataToCsv($target_file_path, $ts_limiter = 0, $country_name = null, $value_type = null, $export_fields = null)
+	private function storeExportData($target_file_path, $csv_header, $dates, $regions, $value_type, $export_fields)
 	{
-		// get fresh data
-		$dates = array();
-		$regions = array();
-
-		ksort($this->regions);
-		foreach ($this->regions as $region)
-		{
-			if ($country_name && ($country_name != $region["country_name"]))
-				continue;
-
-			$data_key = $region["country_name"]."/".$region["region_name"];
-			foreach ($region["timeline"] as $date => $day_stat)
-			{
-				if (strtotime($date) < $ts_limiter)
-					continue;
-
-				if (!isset($regions[$data_key]))
-				{
-					$new_region = $region;
-					$new_region["timeline"] = array();
-					$regions[$data_key] = $new_region;
-				}
-				$regions[$data_key]["timeline"][ $date ] = array(
-																"vaccined"	=> !empty($day_stat["vaccined"]) ? $day_stat["vaccined"] : 0,
-																"tested"	=> !empty($day_stat["tested"]) ? $day_stat["tested"] : 0,
-																"confirmed"	=> !empty($day_stat["confirmed"]) ? $day_stat["confirmed"] : 0,
-																"recovered"	=> !empty($day_stat["recovered"]) ? $day_stat["recovered"] : 0,
-																"deaths"	=> !empty($day_stat["deaths"]) ? $day_stat["deaths"] : 0
-																);
-				$dates[ $date ] = 1;
-			}
-		}
-
-		// sort days
-		$dates = array_keys($dates);
-		sort($dates);
-
-		// create CSV file
 		$fp = fopen($target_file_path, "w");
 		if (!$fp)
 			trigger_error("COVID-19: Can't open target file!", E_USER_ERROR);
-
-		if (!$export_fields)
-			$export_fields = array(
-								"country_name"	=> "Country",
-								"country_iso"	=> "Country ISO",
-								"region_name"	=> "Region",
-								"region_iso"	=> "Region ISO",
-								"population"	=> "Population",
-								);
-
-		// header
-		$csv_header = array_values($export_fields);
-		if ($value_type)
-		{
-			foreach ($dates as $date)
-				$csv_header[] = date("n/d/y", strtotime($date));	// similar to https://github.com/CSSEGISandData/COVID-19
-		}
-		else	// global my format
-		{
-			foreach ($dates as $date)
-				$csv_header[] = date("Y-m-d", strtotime($date));
-		}
 		fputcsv($fp, $csv_header);
 
 		// data
@@ -649,7 +590,179 @@ class COVID19DATA
 		if (filesize($target_file_path) == 0)
 			trigger_error("COVID-19: Export file is empty. Something wrong!", E_USER_ERROR);
 	}
+
+	function ExportDataToCsv($target_file_path, $ts_limiter = 0, $country_name = null, $value_type = null, $export_fields = null)
+	{
+		// get fresh data
+		$dates = array();
+		$regions = array();
+
+		ksort($this->regions);
+		foreach ($this->regions as $region)
+		{
+			if ($country_name && ($country_name != $region["country_name"]))
+				continue;
+
+			$data_key = $region["country_name"]."/".$region["region_name"];
+			foreach ($region["timeline"] as $date => $day_stat)
+			{
+				if (strtotime($date) < $ts_limiter)
+					continue;
+
+				if (!isset($regions[$data_key]))
+				{
+					$new_region = $region;
+					$new_region["timeline"] = array();
+					$regions[$data_key] = $new_region;
+				}
+				$regions[$data_key]["timeline"][ $date ] = array(
+																"vaccined"	=> !empty($day_stat["vaccined"]) ? $day_stat["vaccined"] : 0,
+																"tested"	=> !empty($day_stat["tested"]) ? $day_stat["tested"] : 0,
+																"confirmed"	=> !empty($day_stat["confirmed"]) ? $day_stat["confirmed"] : 0,
+																"recovered"	=> !empty($day_stat["recovered"]) ? $day_stat["recovered"] : 0,
+																"deaths"	=> !empty($day_stat["deaths"]) ? $day_stat["deaths"] : 0
+																);
+				$dates[ $date ] = 1;
+			}
+		}
+
+		// sort days
+		$dates = array_keys($dates);
+		sort($dates);
+
+		// create CSV file
+		if (!$export_fields)
+			$export_fields = array(
+								"country_name"	=> "Country",
+								"country_iso"	=> "Country ISO",
+								"region_name"	=> "Region",
+								"region_iso"	=> "Region ISO",
+								"population"	=> "Population",
+								);
+
+		// header
+		$csv_header = array_values($export_fields);
+		if ($value_type)
+		{
+			foreach ($dates as $date)
+				$csv_header[] = date("n/d/y", strtotime($date));	// similar to https://github.com/CSSEGISandData/COVID-19
+		}
+		else	// global my format
+		{
+			foreach ($dates as $date)
+				$csv_header[] = date("Y-m-d", strtotime($date));
+		}
+
+		$this->storeExportData($target_file_path, $csv_header, $dates, $regions, $value_type, $export_fields);
+	}
+
+	function ExportGroupedDataToCsv($target_file_path, $group_type, $ts_limiter = 0, $country_name = null, $value_type = null, $export_fields = null)
+	{
+		// get fresh data
+		$dates = array();
+		$regions = array();
+
+		$current_group = null;
+		if ($group_type == "month")
+			$current_group = date("Y-m");
+		else if ($group_type == "week")
+			$current_group = date("o-W");
+
+		ksort($this->regions);
+		foreach ($this->regions as $region)
+		{
+			if ($country_name && ($country_name != $region["country_name"]))
+				continue;
+
+			$data_key = $region["country_name"]."/".$region["region_name"];
+			foreach ($region["timeline"] as $date => $day_stat)
+			{
+				if (strtotime($date) < $ts_limiter)
+					continue;
+
+				if ($group_type == "month")
+					$date = substr($date, 0, 7);
+				else if ($group_type == "week")
+					$date = date("o-W", strtotime($date));
+
+				if ($date === $current_group)	// ignore current not finished period
+					continue;
+
+				if (!isset($regions[$data_key]))
+				{
+					$new_region = $region;
+					$new_region["timeline"] = array();
+					$regions[$data_key] = $new_region;
+				}
+				if (!isset($regions[$data_key]["timeline"][$date]))
+				{
+					$regions[$data_key]["timeline"][$date] = array(
+																"vaccined"	=> 0,
+																"tested"	=> 0,
+																"confirmed"	=> 0,
+																"recovered"	=> 0,
+																"deaths"	=> 0
+																);
+					$dates[ $date ] = 1;
+				}
+
+				$date_item = &$regions[$data_key]["timeline"][$date];
+
+				if (!empty($day_stat["vaccined"]))
+					$date_item["vaccined"] += $day_stat["vaccined"];
+				if (!empty($day_stat["tested"]))
+					$date_item["tested"] += $day_stat["tested"];
+				if (!empty($day_stat["confirmed"]))
+					$date_item["confirmed"] += $day_stat["confirmed"];
+				if (!empty($day_stat["recovered"]))
+					$date_item["vaccined"] += $day_stat["recovered"];
+				if (!empty($day_stat["deaths"]))
+					$date_item["deaths"] += $day_stat["deaths"];
+			}
+		}
+
+		// sort days
+		$dates = array_keys($dates);
+		sort($dates);
+
+		// create CSV file
+		if (!$export_fields)
+			$export_fields = array(
+								"country_name"	=> "Country",
+								"country_iso"	=> "Country ISO",
+								"region_name"	=> "Region",
+								"region_iso"	=> "Region ISO",
+								"population"	=> "Population",
+								);
+
+		// header
+		$date_format = "";
+		$csv_header = array_values($export_fields);
+		if ($value_type)
+		{
+			if ($group_type == "month")
+				$date_format = "n/y";
+			else if ($group_type == "week")
+				$date_format = "W/o";
+
+			foreach ($dates as $date)
+				$csv_header[] = date($date_format, strtotime($date));	// similar to https://github.com/CSSEGISandData/COVID-19
+		}
+		else	// global my format
+		{
+			if ($group_type == "month")
+				$date_format = "Y-m";
+			else if ($group_type == "week")
+				$date_format = "o-W";
+
+			foreach ($dates as $date)
+				$csv_header[] = date($date_format, strtotime($date));
+		}
+
+		$this->storeExportData($target_file_path, $csv_header, $dates, $regions, $value_type, $export_fields);
+	}
 }
+
 
 $COVID19DATA = new COVID19DATA();
 if (!isset($DATA_COUNTRY_NAME))
