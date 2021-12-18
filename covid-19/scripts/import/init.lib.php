@@ -675,6 +675,7 @@ class COVID19DATA
 				continue;
 
 			$data_key = $region["country_name"]."/".$region["region_name"];
+			ksort($region["timeline"]);
 			foreach ($region["timeline"] as $date => $day_stat)
 			{
 				if (strtotime($date) < $ts_limiter)
@@ -708,16 +709,17 @@ class COVID19DATA
 
 				$date_item = &$regions[$data_key]["timeline"][$date];
 
+				// each time rewrite, because we already has cummulative values in incremented day-item
 				if (!empty($day_stat["vaccined"]))
-					$date_item["vaccined"] += $day_stat["vaccined"];
+					$date_item["vaccined"] = $day_stat["vaccined"];
 				if (!empty($day_stat["tested"]))
-					$date_item["tested"] += $day_stat["tested"];
+					$date_item["tested"] = $day_stat["tested"];
 				if (!empty($day_stat["confirmed"]))
-					$date_item["confirmed"] += $day_stat["confirmed"];
+					$date_item["confirmed"] = $day_stat["confirmed"];
 				if (!empty($day_stat["recovered"]))
-					$date_item["vaccined"] += $day_stat["recovered"];
+					$date_item["vaccined"] = $day_stat["recovered"];
 				if (!empty($day_stat["deaths"]))
-					$date_item["deaths"] += $day_stat["deaths"];
+					$date_item["deaths"] = $day_stat["deaths"];
 			}
 		}
 
