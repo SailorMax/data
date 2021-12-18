@@ -25,6 +25,7 @@
 		"analytics":		"Аналитика",
 		"statistic":		"Статистика",
 		"results":			"Результаты",
+		"vactination":		"Вакцинация",
 		"comparsions":		"Сравнение",
 
 		"tested":			"протестированы",
@@ -35,11 +36,11 @@
 		"contagiosus":		"заразность",
 		"new_infected":		"новые заразившиеся",
 		"total_infected":	"всего заразившихся",
+		"deaths":			"смертей",
+		"deaths_per_confirmed":	"Смертность к заболевшим",
 
 		"vaccined":			"вакцинировано",
 		"unknown":			"неизвестно",
-
-		"deaths_per_recovered":	"Смертность к заболевшим",
 
 		"infected_per_period":	"Количество новых заболевших за последние",
 		"days":					"дней",

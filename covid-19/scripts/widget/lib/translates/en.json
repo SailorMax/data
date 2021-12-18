@@ -25,6 +25,7 @@
 		"analytics":		"Analytics",
 		"statistic":		"Statistics",
 		"results":			"Results",
+		"vactination":		"Vactionation",
 		"comparsions":		"Comparsion",
 
 		"tested":			"tested",
@@ -35,11 +36,11 @@
 		"contagiosus":		"contagiosus",
 		"new_infected":		"new infected",
 		"total_infected":	"total infected",
+		"deaths":			"deaths",
+		"deaths_per_confirmed":	"deaths per sick",
 
 		"vaccined":			"vaccined",
 		"unknown":			"unknown",
-
-		"deaths_per_recovered":	"deaths per sick",
 
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",

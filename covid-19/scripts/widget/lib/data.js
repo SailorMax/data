@@ -35,8 +35,9 @@ class Covid19Data
 		// will be filled later
 		this.countries = [];
 		this.timeline = {};
-		this.min_ts = 0;		// minimal ts for calculate (max - week_size*2)
+		this.months_timeline = {};
 		this.max_ts = 0;
+		this.max_month_ts = 0;
 
 		this.code2country = {};
 		this.country2code = {};
@@ -73,6 +74,7 @@ class Covid19Data
 				for (var fname of this.value_field_names)
 					day_changes[fname] = 0;
 				day_changes["total_confirmed"] = 0;
+				day_changes["total_vaccined"] = 0;
 
 				var country_changes = [];
 				for (var country_name in day)
@@ -84,6 +86,7 @@ class Covid19Data
 					for (var fname of this.value_field_names)
 						day_changes[fname] += country_day_changes[fname];
 					day_changes["total_confirmed"] += day[country_name]["confirmed"];
+					day_changes["total_vaccined"] += day[country_name]["vaccined"];
 					country_changes.push( country_day_changes );
 				}
 
@@ -93,6 +96,7 @@ class Covid19Data
 			{
 				this.SetChangesPerDay(day_changes, day, prev_day);
 				day_changes["total_confirmed"] = day.confirmed;
+				day_changes["total_vaccined"] = day.vaccined;
 			}
 
 			changes.push( day_changes );
@@ -127,6 +131,13 @@ class Covid19Data
 	GetDaysListFromData(data)
 	{
 		return Object.keys( data ).map( key => data[key].date );
+	}
+
+	GetVaccinedPercentListFromData(data, population)
+	{
+		if (!population)
+			population = 1;
+		return Object.keys( data ).map( key => (data[key].total_vaccined / population * 100) );
 	}
 
 	GetAllCountryNames()
@@ -271,6 +282,39 @@ class Covid19Data
 		});
 	};
 
+	AddNewCountry(country_iso, country_name, region_iso, region, population)
+	{
+		var country_region = region;
+		var country_full_name = country_name;
+		if (country_region.length)
+			country_full_name += " / " + country_region;
+
+		var country = this.GetCountryByFullName(country_full_name);
+		if (!country)
+		{
+			country = {
+						code: country_iso || country_name,
+						name: country_name,
+						region: country_region.length ? country_region : null,
+						region_code: region_iso || country_region || null,
+						full_name: country_full_name,
+						population: population-0,
+						timeline: [],
+						months_timeline: [],
+						};
+
+			this.countries.push(country);
+
+			if (!this.code2country[ country.code ])
+				this.code2country[ country.code ] = country.name;
+			if (!this.country2code[ country.name ])
+				this.country2code[ country.name ] = country.code;
+			if (!this.region2code[ country.full_name ])
+				this.region2code[ country.full_name ] = country.region_code;
+		}
+		return country;
+	}
+
 	AppendData(provider, data_name, raw_data)
 	{
 		switch (provider)
@@ -278,39 +322,16 @@ class Covid19Data
 /*
 			case "CSSEGI":
 				var require_cols = [];
+				var min_ts = 0;
 				for (row of raw_data)
 				{
-					var country_name = row["Country/Region"];
-					var country_region = row["Province/State"];
-					var country_full_name = country_name;
-					if (country_region.length)
-						country_full_name += " / " + country_region;
-
-					// get country object
-					var country = this.GetCountryByFullName(country_full_name);
-					if (!country)
-					{
-						var country = {
-								code: COUNTRY_CODE[country_name] || country_name,
-								name: country_name,
-								region: country_region.length ? country_region : null,
-								region_code: null,
-								full_name: country_full_name,
-								timeline: [],
-							};
-						this.countries.push(country);
-
-						if (!this.code2country[ country.code ])
-							this.code2country[ country.code ] = country.name;
-						if (!this.country2code[ country.name ])
-							this.country2code[ country.name ] = country.code;
-					}
+					var country = this.AddNewCountry(null, row["Country/Region"], null, row["Province/State"], 0);
 
 					// calculate min_ts
-					if (!this.min_ts)
+					if (!min_ts)
 					{
 						var max_date = Object.keys(row).reduce( (max, key) => { var dt = (new Date(key))-0; return (dt && dt > max ? dt : max); }, 0 );
-						this.min_ts = (new Date(max_date - (week_size_ms*2)))-0;
+						min_ts = (new Date(max_date - (week_size_ms*2)))-0;
 					}
 
 					// collect require_cols to minimize date recognitions
@@ -321,7 +342,7 @@ class Covid19Data
 						{
 							if (!isNaN(k.substr(0, 1)))
 							{
-								if ((ts=(new Date(k))-0) >= this.min_ts)
+								if ((ts=(new Date(k))-0) >= min_ts)
 									require_cols.unshift({ name:k, ts:ts });	// put in correct order
 								else
 									break;	// original list is sorted => if date less than required -> stop calculate others
@@ -358,43 +379,17 @@ class Covid19Data
 				switch (data_name)
 				{
 					case "merged":
+						var min_ts = 0;
 						var require_cols = [];
 						for (var row of raw_data)
 						{
-							var country_name = row["Country"];
-							var country_region = row["Region"];
-							var country_full_name = country_name;
-							if (country_region.length)
-								country_full_name += " / " + country_region;
-
-							// get country object
-							var country = this.GetCountryByFullName(country_full_name);
-							if (!country)
-							{
-								var country = {
-										code: row["Country ISO"] || country_name,
-										name: country_name,
-										region: country_region.length ? country_region : null,
-										region_code: row["Region ISO"] || country_region || null,
-										full_name: country_full_name,
-										population: row["Population"]-0,
-										timeline: [],
-									};
-								this.countries.push(country);
-
-								if (!this.code2country[ country.code ])
-									this.code2country[ country.code ] = country.name;
-								if (!this.country2code[ country.name ])
-									this.country2code[ country.name ] = country.code;
-								if (!this.region2code[ country.full_name ])
-									this.region2code[ country.full_name ] = country.region_code;
-							}
+							var country = this.AddNewCountry(row["Country ISO"], row["Country"], row["Region ISO"], row["Region"], row["Population"]);
 
 							// calculate min_ts
 							if (!this.max_ts)
 							{
 								this.max_ts = Object.keys(row).reduce( (max, key) => { var dt = (new Date(key))-0; return (dt && dt > max ? dt : max); }, 0 );
-								this.min_ts = (new Date(this.max_ts - (this.use_last_x_days*this.ms_in_day)))-this.ms_in_day;	// minus 1 day for better calculate first day changes
+								min_ts = (new Date(this.max_ts - (this.use_last_x_days*this.ms_in_day)))-this.ms_in_day;	// minus 1 day for better calculate first day changes
 							}
 
 							// collect require_cols to minimize date recognitions
@@ -405,7 +400,7 @@ class Covid19Data
 								{
 									if (!isNaN(k.substr(0, 1)))
 									{
-										if ((ts=(new Date(k))-0) >= this.min_ts)
+										if ((ts=(new Date(k))-0) >= min_ts)
 											require_cols.unshift({ name:k, ts:ts });	// put in correct order
 										else
 											break;	// original list is sorted => if date less than required -> stop calculate others
@@ -421,8 +416,8 @@ class Covid19Data
 								if (!country.timeline[ts])
 									country.timeline[ts] = {};
 
-								if (data_name == "merged")
-								{
+//								if (data_name == "merged")
+//								{
 									// my format
 									var crd = row[key.name].split("/");
 									if (crd.length > 4)
@@ -453,13 +448,88 @@ class Covid19Data
 									}
 
 									prev_crd = crd;
-								}
-								else
-									country.timeline[ts][data_name] = row[key.name]-0;
+//								}
+//								else
+//									country.timeline[ts][data_name] = row[key.name]-0;
 
 								if (!this.timeline[ts])
 									this.timeline[ts] = {};
-								this.timeline[ts][country_full_name] = country.timeline[ts];
+								this.timeline[ts][ country.full_name ] = country.timeline[ts];
+							}
+						}
+						break;
+
+					case "merged_months":
+						var min_ts = 0;
+						var require_cols = [];
+						for (var row of raw_data)
+						{
+							var country = this.AddNewCountry(row["Country ISO"], row["Country"], row["Region ISO"], row["Region"], row["Population"]);
+							// calculate min_ts
+							if (!this.max_month_ts)
+							{
+								this.max_month_ts = Object.keys(row).reduce( (max, key) => { var dt = (new Date(key))-0; return (dt && dt > max ? dt : max); }, 0 );
+								min_ts = (new Date(this.max_month_ts - 15*31*this.ms_in_day));	// 15 months (year + few months)
+							}
+
+							// collect require_cols to minimize date recognitions
+							if (!require_cols.length)
+							{
+								var ts, keys = Object.keys(row).reverse();
+								for (var k of keys)
+								{
+									if (!isNaN(k.substr(0, 1)))
+									{
+										if ((ts=(new Date(k))-0) >= min_ts)
+											require_cols.unshift({ name:k, ts:ts });	// put in correct order
+										else
+											break;	// original list is sorted => if date less than required -> stop calculate others
+									}
+								}
+							}
+
+							// collect required data
+							var prev_crd = [0, 0, 0, 0, 0];
+							for (var key of require_cols)
+							{
+								var ts = key.ts;
+								if (!country.months_timeline[ts])
+									country.months_timeline[ts] = {};
+
+								// my format
+								var crd = row[key.name].split("/");
+								if (crd.length > 4)
+								{
+									// inherit `vaccined` from previous day if current is empty
+									if (crd[0]-0 == 0)
+										crd[0] = prev_crd[0];
+
+									country.months_timeline[ts]["vaccined"]		= crd[0]-0;
+									country.months_timeline[ts]["tested"]		= crd[1]-0;
+									country.months_timeline[ts]["confirmed"]	= crd[2]-0;
+									country.months_timeline[ts]["recovered"]	= crd[3]-0;
+									country.months_timeline[ts]["deaths"]		= crd[4]-0;
+								}
+								// back compatibility
+								else if (crd.length > 3)
+								{
+									country.months_timeline[ts]["tested"]		= crd[0]-0;
+									country.months_timeline[ts]["confirmed"]	= crd[1]-0;
+									country.months_timeline[ts]["recovered"]	= crd[2]-0;
+									country.months_timeline[ts]["deaths"]		= crd[3]-0;
+								}
+								else
+								{
+									country.months_timeline[ts]["confirmed"]	= crd[0]-0;
+									country.months_timeline[ts]["recovered"]	= crd[1]-0;
+									country.months_timeline[ts]["deaths"]		= crd[2]-0;
+								}
+
+								prev_crd = crd;
+
+								if (!this.months_timeline[ts])
+									this.months_timeline[ts] = {};
+								this.months_timeline[ts][ country.full_name ] = country.months_timeline[ts];
 							}
 						}
 						break;
@@ -701,6 +771,36 @@ class Covid19Data
 				}
 				else
 					grouped_day[ country.full_name ] = country.timeline[ts];
+			}
+		}
+		return grouped_timeline;
+	}
+
+	GetMonthsTimelineByCountryName(name)
+	{
+		if (name.substr)
+			return this.GetCountryByFullName(name).months_timeline;
+
+		// by list of countries
+		var names_list = name;
+		var grouped_timeline = {};
+		var countries = this.countries.filter( d => names_list.indexOf(d.full_name) >= 0 );
+		for (var country of countries)
+		{
+			for (var ts in country.months_timeline)
+			{
+				var grouped_day = grouped_timeline[ts];
+				if (!grouped_day)
+					grouped_day = grouped_timeline[ts] = {};
+
+				// if countries list has only 1 country, but this country has regions => collect them
+				if (countries.length === 1 && country.regions && (country.regions.length > 0))
+				{
+					for (var region of country.regions)
+						grouped_day[ region.full_name ] = region.months_timeline[ts];
+				}
+				else
+					grouped_day[ country.full_name ] = country.months_timeline[ts];
 			}
 		}
 		return grouped_timeline;
