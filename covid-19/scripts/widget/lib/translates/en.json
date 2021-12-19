@@ -30,6 +30,7 @@
 
 		"tested":			"tested",
 		"infected":			"infected",
+		"was_infected":		"was infected",
 		"recovered":		"recovered",
 		"deaths":			"deaths",
 		
@@ -38,6 +39,7 @@
 		"total_infected":	"total infected",
 		"deaths":			"deaths",
 		"deaths_per_confirmed":	"deaths per sick",
+		"deaths_per_confirmed_percent":	"deaths per sick (%)",
 
 		"vaccined":			"vaccined",
 		"unknown":			"unknown",

@@ -746,6 +746,29 @@ class Covid19Data
 		return countries_timeline;
 	}
 
+	GetMonthsTimelineWithoutCountryDuplicates()
+	{
+		// remove duplicates (Russia and Russia / ∑)
+		var countries_timeline = {};
+		for (var ts in this.months_timeline)
+		{
+			var orig_day_countries = this.months_timeline[ts];
+			var day_countries = Object.assign({}, orig_day_countries);
+			for (var country_name in orig_day_countries)
+			{
+				if (country_name.substr(-1) == "∑")
+				{
+					var name_els = country_name.split(" / ");
+					if (day_countries[ name_els[0] ])
+						delete day_countries[country_name];
+				}
+			}
+
+			countries_timeline[ts] = day_countries;
+		}
+		return countries_timeline;
+	}
+
 	GetTimelineByCountryName(name)
 	{
 		if (name.substr)

@@ -30,6 +30,7 @@
 
 		"tested":			"протестированы",
 		"infected":			"инфицированы",
+		"was_infected":		"были инфицированы",
 		"recovered":		"выздоровели",
 		"deaths":			"умерли",
 		
@@ -38,6 +39,7 @@
 		"total_infected":	"всего заразившихся",
 		"deaths":			"смертей",
 		"deaths_per_confirmed":	"Смертность к заболевшим",
+		"deaths_per_confirmed_percent":	"Смертность к заболевшим (%)",
 
 		"vaccined":			"вакцинировано",
 		"unknown":			"неизвестно",
