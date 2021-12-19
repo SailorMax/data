@@ -662,12 +662,6 @@ class COVID19DATA
 		$dates = array();
 		$regions = array();
 
-		$current_group = null;
-		if ($group_type == "month")
-			$current_group = date("Y-m");
-		else if ($group_type == "week")
-			$current_group = date("o-W");
-
 		ksort($this->regions);
 		foreach ($this->regions as $region)
 		{
@@ -685,9 +679,6 @@ class COVID19DATA
 					$date = substr($date, 0, 7);
 				else if ($group_type == "week")
 					$date = date("o-W", strtotime($date));
-
-				if ($date === $current_group)	// ignore current not finished period
-					continue;
 
 				if (!isset($regions[$data_key]))
 				{
