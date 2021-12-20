@@ -618,7 +618,7 @@ class Covid19Widget
 			var no_syptoms_ratio = 3;
 			var calc_days = d3_box.select(".infected_per_period TD INPUT").property("value");
 			var scale = d3_box.select(".infected_per_x TD INPUT").property("value");
-			var use_asymptomatic = d3_box.select("INPUT.use_asymptomatic").property("checked");
+			var use_asymptomatic = d3_tools.select("INPUT.use_asymptomatic").property("checked");
 
 			var asymp_ratio = use_asymptomatic ? 3 : 1;
 
@@ -697,7 +697,7 @@ class Covid19Widget
 				.on("input", funcRecalculateValues)
 			.select(function(){ return this.parentNode; })
 			.append("span")
-				.text("учитывать вероятных бессимптомных носителей (по минимуму)")
+				.text(this.WORDS["use_asymptomatic"])
 			.select(function(){ return this.parentNode; })
 			.append("sup")
 				.append("a")
@@ -1494,153 +1494,186 @@ class Covid19Widget
 		// create detached element
 		var d3_box = d3.create("div")
 						.attr("class", "svg");
+		var d3_tools = d3_box.append("div")
+						.attr("class", "toolbar");
 		var d3_svg = d3_box.append("svg")
 						.attr("width", this.width)
-						.attr("height", this.height + 12);	// plusspace for second row of x-axis titles
+						.attr("height", this.height + 12);	// plus space for second row of x-axis titles
 
-		// axis
-		var x_scale = d3.scaleBand(this.data.GetDaysListFromData(country_data), [this.margin.left, this.width - this.margin.right]).paddingInner(0.5).paddingOuter(0.5);
-		d3_svg.append("g")
-			.attr("transform", "translate(0,"+(this.height - this.margin.bottom)+")")
-//			.call(d3.axisBottom(x_scale).tickFormat( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100)+"%" ))
-			.call(d3.axisBottom(x_scale).tickFormat(""))
-			.selectAll("text")
-			.append('tspan')
-			.text( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100)+"%" )
-				.attr("x", "0")
-				.attr("dy", "0.71em")
-				.append("title")	// hint
-					.text( (d, k) => Covid19DataTools.numberFormat(country_data[k].total_vaccined) )
-				.select( function(){ return this.parentNode.parentNode; } )
-			.append('tspan')
-			.text( (d, k) => Covid19DataTools.formatMonth(country_data[k].date) )
-				.attr("x", "0")
-				.attr("dy", "1.3em");
-
-		var deaths_per_confirmed = country_data.map( d => (d.confirmed ? d.deaths / d.confirmed * 100 : 100));
-		var max_death_per_confirm = Math.max(...deaths_per_confirmed);
-//		var has_deaths = max_death_per_confirm > 0;
-
-		var y_scale = d3.scaleLinear([Math.ceil(max_death_per_confirm*1.3), 0], [0, this.height-this.margin.top-this.margin.bottom]);
-		d3_svg.append("g")
-			.attr("transform", "translate("+this.margin.left+","+this.margin.top+")")
-			.attr("color", "red")
-			.call(d3.axisLeft(y_scale))
-			.call(g => g.selectAll(".tick")
-						.each((val, idx, arr) => {
-								if (val >= Covid19DataTools.largetNumberLimiter)
-									d3.select(arr[idx]).selectAll("text").text( Covid19DataTools.GetFormattedNumber(val) );
-						})
-			)
-			.call(g => g.select(".domain").remove());
-
-		var max_new_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
-//		var has_infections = max_new_confirmed > 0;
-
-		var y2_scale = d3.scaleLinear([Math.ceil(max_new_confirmed*1.3), 0], [0, this.height-this.margin.top-this.margin.bottom]);
-		d3_svg.append("g")
-			.attr("transform", "translate("+(this.width-this.margin.right)+","+(this.margin.top)+")")
-			.attr("color", "steelblue")
-			.call(d3.axisRight(y2_scale))
-			.call(g => g.selectAll(".tick")
-						.each((val, idx, arr) => {
-								if (val >= Covid19DataTools.largetNumberLimiter)
-									d3.select(arr[idx]).selectAll("text").text( Covid19DataTools.GetFormattedNumber(val) );
-						})
-			)
-			.call(g => g.select(".domain").remove());
-		//
-
-		// axis labels
-		d3_svg.append("text")
-			.attr("font-family", "sans-serif")
-			.attr("font-size", 11)
-			.attr("fill", "red")
-			.attr("x", 0)
-			.attr("y", 10)
-			.text(this.WORDS["deaths_per_confirmed_percent"].toLowerCase());
-
-		d3_svg.append("text")
-			.attr("font-family", "sans-serif")
-			.attr("font-size", 11)
-			.attr("fill", "steelblue")
-			.attr("x", this.width - 120)
-			.attr("y", 10)
-			.text(this.WORDS["new_infected"]);
-
-//		if (has_deaths)
+		var funcRecalculateValues = function()
 		{
-			// confirmed bars
-			var d3_virt_bars = d3_svg.append("g")
-				.attr("fill", "steelblue")
-				.selectAll()
-				.data(country_data);
+			var show_absolute_values = d3_tools.select("INPUT.show_absolute_values").property("checked");
 
-			d3_virt_bars.join("rect")
-				.attr("x",		d => x_scale(d.date))
-				.attr("y",		d => y2_scale(d.confirmed) + this.margin.top)
-				.attr("height",	d => Math.max(0, y2_scale(0) - y2_scale(d.confirmed)))
-				.attr("width",	x_scale.bandwidth())
-				.attr("fill-opacity","0.3")
-				.on("click",	this.ShowHideHint)
-				.append("title")	// hint
-					.text(d => Covid19DataTools.GetFormattedNumber(d.confirmed));
+			d3_svg.selectAll("*").remove();
 
-			d3_virt_bars.join("circle")
-				.attr("r", 3)
-				.attr("cx", d => x_scale(d.date) + Math.round(x_scale.bandwidth()/2) )
-				.attr("cy", d => y_scale(d.deaths/(d.confirmed?d.confirmed:1)*100) + this.margin.top )
+			// axis
+			var x_scale = d3.scaleBand(self.data.GetDaysListFromData(country_data), [self.margin.left, self.width - self.margin.right]).paddingInner(0.5).paddingOuter(0.5);
+			d3_svg.append("g")
+				.attr("transform", "translate(0,"+(self.height - self.margin.bottom)+")")
+	//			.call(d3.axisBottom(x_scale).tickFormat( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100)+"%" ))
+				.call(d3.axisBottom(x_scale).tickFormat(""))
+				.selectAll("text")
+				.append('tspan')
+				.text( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100)+"%" )
+					.attr("x", "0")
+					.attr("dy", "0.71em")
+					.append("title")	// hint
+						.text( (d, k) => Covid19DataTools.numberFormat(country_data[k].total_vaccined) )
+					.select( function(){ return this.parentNode.parentNode; } )
+				.append('tspan')
+				.text( (d, k) => Covid19DataTools.formatMonth(country_data[k].date) )
+					.attr("x", "0")
+					.attr("dy", "1.3em");
+
+			var funcDeathsValue;
+			if (show_absolute_values)
+				funcDeathsValue = function(d) { return (population ? (d.deaths / population * 100000) : d.deaths) };
+			else
+				funcDeathsValue = function(d) { return (d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) };
+
+			var deaths_per_confirmed = country_data.map( funcDeathsValue );
+			var max_death_per_confirm = Math.max(...deaths_per_confirmed);
+
+			var y_scale = d3.scaleLinear([Math.ceil(max_death_per_confirm*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]);
+			d3_svg.append("g")
+				.attr("transform", "translate("+self.margin.left+","+self.margin.top+")")
+				.attr("color", "red")
+				.call(d3.axisLeft(y_scale))
+				.call(g => g.selectAll(".tick")
+							.each((val, idx, arr) => {
+									if (val >= Covid19DataTools.largetNumberLimiter)
+										d3.select(arr[idx]).selectAll("text").text( Covid19DataTools.GetFormattedNumber(val) );
+							})
+				)
+				.call(g => g.select(".domain").remove());
+
+			var max_new_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
+
+			var y2_scale = d3.scaleLinear([Math.ceil(max_new_confirmed*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]);
+			d3_svg.append("g")
+				.attr("transform", "translate("+(self.width-self.margin.right)+","+(self.margin.top)+")")
+				.attr("color", "steelblue")
+				.call(d3.axisRight(y2_scale))
+				.call(g => g.selectAll(".tick")
+							.each((val, idx, arr) => {
+									if (val >= Covid19DataTools.largetNumberLimiter)
+										d3.select(arr[idx]).selectAll("text").text( Covid19DataTools.GetFormattedNumber(val) );
+							})
+				)
+				.call(g => g.select(".domain").remove());
+			//
+
+			// axis labels
+			d3_svg.append("text")
+				.attr("font-family", "sans-serif")
+				.attr("font-size", 11)
 				.attr("fill", "red")
-				.append("title")	// hint
-					.text( d => Covid19DataTools.GetFormattedNumber(d.deaths, true) );
-		}
+				.attr("x", 0)
+				.attr("y", 10)
+				.text( (show_absolute_values ? self.WORDS["deaths_per_100k"] : self.WORDS["deaths_per_confirmed_percent"]).toLowerCase());
 
-		// regression of deaths
-		var death_ratios = country_data.map( d => ({ "date":d.date, "value":d.deaths/(d.confirmed?d.confirmed:1)*100 }) );
-		var moving_average_data = Covid19DataTools.GetSimpleMovingWeightedAverage(death_ratios, "value", death_ratios.length, 2);
-		var xy_list = moving_average_data.map((d,idx) => [idx, d.value]);
-		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, moving_average_data.length);
-		var contag_func = regression_method.func;
-		var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
-		xy_list =  xy_list.slice(xy_list.length-death_ratios.length);		// work only with latest data
-		if (contag_func)
-		{
-			var new_xy_list = xy_list.map( (d,idx) => [ idx, contag_func(d[0]-idx_shift) ] );
+			d3_svg.append("text")
+				.attr("font-family", "sans-serif")
+				.attr("font-size", 11)
+				.attr("fill", "steelblue")
+				.attr("x", self.width - 120)
+				.attr("y", 10)
+				.text(self.WORDS["new_infected"]);
 
-			var start_date = death_ratios[0].date;
-			var d3_line = d3.line()
-							.x( d => { return x_scale(moving_average_data[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
-							.y( d => y_scale(d[1]) + this.margin.top);
-			d3_svg.append("path")
-				.style("stroke-dasharray", ("3, 3"))
-				.attr("d", d3_line(new_xy_list))
-				.attr("stroke", "#ff000033")
-				.attr("fill", "none");
-		}
+	//		if (has_deaths)
+			{
+				// confirmed bars
+				var d3_virt_bars = d3_svg.append("g")
+					.attr("fill", "steelblue")
+					.selectAll()
+					.data(country_data);
 
-		// regression of infections
-		var confirmed_ratios = country_data.map( d => ({ "date":d.date, "value":d.confirmed }) );
-		confirmed_ratios.pop();	// remove last month, because it is not finished
-		var moving_average_data = Covid19DataTools.GetSimpleMovingWeightedAverage(confirmed_ratios, "value", confirmed_ratios.length, 2);
-		var xy_list = moving_average_data.map((d,idx) => [idx, d.value]);
-		var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, moving_average_data.length);
-		var contag_func = regression_method.func;
-		var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
-		xy_list =  xy_list.slice(xy_list.length-confirmed_ratios.length);		// work only with latest data
-		if (contag_func)
-		{
-			var new_xy_list = xy_list.map( (d,idx) => [ idx, contag_func(d[0]-idx_shift) ] );
+				d3_virt_bars.join("rect")
+					.attr("x",		d => x_scale(d.date))
+					.attr("y",		d => y2_scale(d.confirmed) + self.margin.top)
+					.attr("height",	d => Math.max(0, y2_scale(0) - y2_scale(d.confirmed)))
+					.attr("width",	x_scale.bandwidth())
+					.attr("fill-opacity","0.3")
+					.on("click",	self.ShowHideHint)
+					.append("title")	// hint
+						.text(d => Covid19DataTools.GetFormattedNumber(d.confirmed));
 
-			var start_date = confirmed_ratios[0].date;
-			var d3_line = d3.line()
-							.x( d => { return x_scale(moving_average_data[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
-							.y( d => y2_scale(d[1]) + this.margin.top);
-			d3_svg.append("path")
-				.style("stroke-dasharray", ("3, 3"))
-				.attr("d", d3_line(new_xy_list))
-				.attr("stroke", "#0000ff33")
-				.attr("fill", "none");
-		}
+				d3_virt_bars.join("circle")
+					.attr("r", 3)
+					.attr("cx", d => x_scale(d.date) + Math.round(x_scale.bandwidth()/2) )
+					.attr("cy", d => y_scale( funcDeathsValue(d) ) + self.margin.top )
+					.attr("fill", "red")
+					.append("title")	// hint
+						.text( d => Covid19DataTools.GetFormattedNumber(d.deaths, self) );
+			}
+
+			// regression of deaths
+			var death_ratios = country_data.map( d => ({ "date":d.date, "value":funcDeathsValue(d) }) );
+			if (show_absolute_values)
+				death_ratios.pop();	// remove last month, because it is not finished
+//			var moving_average_data = Covid19DataTools.GetSimpleMovingWeightedAverage(death_ratios, "value", death_ratios.length, 2);
+//			var xy_list = moving_average_data.map((d,idx) => [idx, d.value]);
+			var xy_list = death_ratios.map((d,idx) => [idx, d.value]);
+//			var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, moving_average_data.length);
+			var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, death_ratios.length);
+			var contag_func = regression_method.func;
+			var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
+			xy_list =  xy_list.slice(xy_list.length-death_ratios.length);		// work only with latest data
+			if (contag_func)
+			{
+				var new_xy_list = xy_list.map( (d,idx) => [ idx, contag_func(d[0]-idx_shift) ] );
+
+				var start_date = death_ratios[0].date;
+				var d3_line = d3.line()
+//								.x( d => { return x_scale(moving_average_data[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
+								.x( d => { return x_scale(death_ratios[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
+								.y( d => y_scale(d[1]) + self.margin.top);
+				d3_svg.append("path")
+					.style("stroke-dasharray", ("3, 3"))
+					.attr("d", d3_line(new_xy_list))
+					.attr("stroke", "#ff000033")
+					.attr("fill", "none");
+			}
+
+			// regression of infections
+			var confirmed_ratios = country_data.map( d => ({ "date":d.date, "value":d.confirmed }) );
+			confirmed_ratios.pop();	// remove last month, because it is not finished
+//			var moving_average_data = Covid19DataTools.GetSimpleMovingWeightedAverage(confirmed_ratios, "value", confirmed_ratios.length, 2);
+//			var xy_list = moving_average_data.map((d,idx) => [idx, d.value]);
+			var xy_list = confirmed_ratios.map((d,idx) => [idx, d.value]);
+//			var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, moving_average_data.length);
+			var regression_method = Covid19DataTools.GetBestRegressionMethod(xy_list, confirmed_ratios.length);
+			var contag_func = regression_method.func;
+			var idx_shift = xy_list[xy_list.length-1][0] - regression_method.last_learn_day_id;
+			xy_list =  xy_list.slice(xy_list.length-confirmed_ratios.length);		// work only with latest data
+			if (contag_func)
+			{
+				var new_xy_list = xy_list.map( (d,idx) => [ idx, contag_func(d[0]-idx_shift) ] );
+
+				var start_date = confirmed_ratios[0].date;
+				var d3_line = d3.line()
+//								.x( d => { return x_scale(moving_average_data[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
+								.x( d => { return x_scale(confirmed_ratios[d[0]].date)+Math.round(x_scale.bandwidth()/2) } )
+								.y( d => y2_scale(d[1]) + self.margin.top);
+				d3_svg.append("path")
+					.style("stroke-dasharray", ("3, 3"))
+					.attr("d", d3_line(new_xy_list))
+					.attr("stroke", "#0000ff33")
+					.attr("fill", "none");
+			}
+		};
+
+		// settings
+		d3_tools.append("label")
+			.append("input")
+				.attr("type", "checkbox")
+				.attr("class", "show_absolute_values")
+				.on("input", funcRecalculateValues)
+			.select(function(){ return this.parentNode; })
+			.append("span")
+				.text(this.WORDS["show_absolute_values"]);
+
+		funcRecalculateValues();
 
 		// attach element to DOM
 		d3.select(box).append( () => d3_box.node() );
@@ -2224,6 +2257,7 @@ class Covid19Widget
 
 /*
 TODO:
+0. top countries by: vaccined percent, sick per 100k, death percent
 1. keep compares when change base country
 2. compare by overal death?
 */

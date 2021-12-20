@@ -37,13 +37,15 @@
 		"contagiosus":		"contagiosus",
 		"new_infected":		"new infected",
 		"total_infected":	"total infected",
-		"deaths":			"deaths",
 		"deaths_per_confirmed":	"deaths per sick",
 		"deaths_per_confirmed_percent":	"deaths per sick (%)",
+		"deaths_per_100k":	"Deaths per 100,000 of population",
 
 		"vaccined":			"vaccined",
 		"unknown":			"unknown",
 
+		"use_asymptomatic":		"use asymptomatic carriers (by minimum)",
+		"show_absolute_values":	"show absolute values",
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",
 		"infected_per_x":		"The number of new cases per",
