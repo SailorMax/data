@@ -45,7 +45,7 @@
 		"unknown":			"unknown",
 
 		"use_asymptomatic":		"use asymptomatic carriers (by minimum)",
-		"show_absolute_values":	"show absolute values",
+		"show_absolute_mortality_values":	"show absolute values of mortality",
 		"infected_per_period":	"The number of new cases over the past",
 		"days":					"days",
 		"infected_per_x":		"The number of new cases per",

@@ -51,7 +51,7 @@ class Covid19Widget
 		var now = new Date();
 		this.bars_count = Math.floor( (this.width - this.margin.left - this.margin.right) / this.bar_space ) - 1;	// -1 - to use >=
 		this.week_size_ms = this.bars_count * this.ms_in_day;
-		this.year_size_ms = this.bars_count * this.ms_in_month;
+		this.year_size_ms = this.bars_count * this.ms_in_month * 2;
 		this.min_date = new Date(now - this.week_size_ms);
 		this.min_year_date = new Date(new Date(now.getFullYear() + "-" + (now.getMonth()+1) + "-01") - this.year_size_ms);
 		this.colors = ["#1f78b4", "#fb9a99", "#cab2d6", "#6a3d9a", "#b15928", "#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#b2df8a", "#666666", "#a6cee3", "#17becf", "#bcbd22", "#e377c2", "#999999"];
@@ -122,7 +122,7 @@ class Covid19Widget
 		var sources = {
 				"merged":			data_source_prefix+"covid-19/31days_covid19_merged_global.csv",
 				"country_borders":	data_source_prefix+"geo/country_borders.csv",
-				"merged_months":	data_source_prefix+"covid-19/18months_covid19_merged_global.csv",
+				"merged_months":	data_source_prefix+"covid-19/24months_covid19_merged_global.csv",
 				};
 		if (this.config.lang != "en")
 		{
@@ -1514,16 +1514,36 @@ class Covid19Widget
 				.call(d3.axisBottom(x_scale).tickFormat(""))
 				.selectAll("text")
 				.append('tspan')
-				.text( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100)+"%" )
+				.text( (d, k) => Math.floor(country_data[k].total_vaccined / population * 100) )
 					.attr("x", "0")
 					.attr("dy", "0.71em")
+					.attr("font-size", 9)
 					.append("title")	// hint
 						.text( (d, k) => Covid19DataTools.numberFormat(country_data[k].total_vaccined) )
 					.select( function(){ return this.parentNode.parentNode; } )
 				.append('tspan')
-				.text( (d, k) => Covid19DataTools.formatMonth(country_data[k].date) )
+				.text( (d, k) => Covid19DataTools.formatMonthOnly(country_data[k].date) )
 					.attr("x", "0")
-					.attr("dy", "1.3em");
+					.attr("dy", "1.3em")
+					.attr("font-size", 7);
+			d3_svg.append("text")
+					.attr("font-size", 9)
+					.attr("x", (self.width - self.margin.right - 4))
+					.attr("y", (self.height - self.margin.bottom + 15))
+					.text( "%" )
+					.select( function(){ return this.parentNode; } )
+				.append("text")
+					.attr("font-size", 7)
+					.attr("x", self.margin.left - 15)
+					.attr("y", (self.height - self.margin.bottom + 25))
+					.text( Covid19DataTools.formatYearOnly(country_data[0].date) )
+					.select( function(){ return this.parentNode; } )
+				.append("text")
+					.attr("font-size", 7)
+					.attr("x", (self.width - self.margin.right - 4))
+					.attr("y", (self.height - self.margin.bottom + 25))
+					.text( Covid19DataTools.formatYearOnly(country_data[country_data.length-1].date) )
+					.select( function(){ return this.parentNode; } );
 
 			var funcDeathsValue;
 			if (show_absolute_values)
@@ -1671,7 +1691,7 @@ class Covid19Widget
 				.on("input", funcRecalculateValues)
 			.select(function(){ return this.parentNode; })
 			.append("span")
-				.text(this.WORDS["show_absolute_values"]);
+				.text(this.WORDS["show_absolute_mortality_values"]);
 
 		funcRecalculateValues();
 

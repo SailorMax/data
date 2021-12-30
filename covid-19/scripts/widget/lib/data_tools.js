@@ -2,6 +2,8 @@ const Covid19DataTools = {
 	formatDate:			d3.timeFormat("%d.%m"),
 	formatMonth:		d3.timeFormat("%m.%y"),
 	formatMonthYear:	d3.timeFormat("%m.%Y"),
+	formatMonthOnly:	d3.timeFormat("%m"),
+	formatYearOnly:		d3.timeFormat("%Y"),
 	numberFormat:		d3.format(","),
 	largeNumberFormat:	d3.format(",.3s"),
 	percentFormat:		d3.format(",.0%"),

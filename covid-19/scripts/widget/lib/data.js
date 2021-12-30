@@ -469,7 +469,7 @@ class Covid19Data
 							if (!this.max_month_ts)
 							{
 								this.max_month_ts = Object.keys(row).reduce( (max, key) => { var dt = (new Date(key))-0; return (dt && dt > max ? dt : max); }, 0 );
-								min_ts = (new Date(this.max_month_ts - 15*31*this.ms_in_day));	// 15 months (year + few months)
+								min_ts = (new Date(this.max_month_ts - 24*31*this.ms_in_day));	// 24 months
 							}
 
 							// collect require_cols to minimize date recognitions
