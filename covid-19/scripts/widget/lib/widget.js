@@ -1548,10 +1548,17 @@ class Covid19Widget
 					.select( function(){ return this.parentNode; } );
 
 			var funcDeathsValue;
+			var funcDeathsTitleValue;
 			if (show_absolute_values)
+			{
 				funcDeathsValue = function(d) { return (population ? (d.deaths / population * 100000) : d.deaths) };
+				funcDeathsTitleValue = function(d) { return Covid19DataTools.minimizeFloat(population ? (d.deaths / population * 100000) : d.deaths) + " ("+d.deaths+")" };
+			}
 			else
+			{
 				funcDeathsValue = function(d) { return (d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) };
+				funcDeathsTitleValue = function(d) { return Covid19DataTools.minimizeFloat(d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) + "% ("+d.deaths+")" };
+			}
 
 			var deaths_per_confirmed = country_data.map( funcDeathsValue );
 			var max_death_per_confirm = Math.max(...deaths_per_confirmed);
@@ -1626,7 +1633,7 @@ class Covid19Widget
 					.attr("cy", d => y_scale( funcDeathsValue(d) ) + self.margin.top )
 					.attr("fill", "red")
 					.append("title")	// hint
-						.text( d => Covid19DataTools.GetFormattedNumber(d.deaths, self) );
+						.text( d => funcDeathsTitleValue(d) );
 			}
 
 			// regression of deaths

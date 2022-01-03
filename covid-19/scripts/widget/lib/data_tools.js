@@ -7,6 +7,7 @@ const Covid19DataTools = {
 	numberFormat:		d3.format(","),
 	largeNumberFormat:	d3.format(",.3s"),
 	percentFormat:		d3.format(",.0%"),
+	minimizeFloat:		d3.format(",.2f"),
 	largetNumberLimiter:100000,
 
 	GetFormattedNumber: function(num, full)
