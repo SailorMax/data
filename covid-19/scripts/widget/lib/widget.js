@@ -1505,6 +1505,7 @@ class Covid19Widget
 			var show_absolute_values = d3_tools.select("INPUT.show_absolute_values").property("checked");
 
 			d3_svg.selectAll("*").remove();
+			var last_good_month_nr = country_data[country_data.length-2].date.getMonth();
 
 			// axis
 			var x_scale = d3.scaleBand(self.data.GetDaysListFromData(country_data), [self.margin.left, self.width - self.margin.right]).paddingInner(0.5).paddingOuter(0.5);
@@ -1525,7 +1526,8 @@ class Covid19Widget
 				.text( (d, k) => Covid19DataTools.formatMonthOnly(country_data[k].date) )
 					.attr("x", "0")
 					.attr("dy", "1.3em")
-					.attr("font-size", 7);
+					.attr("font-size", 7)
+					.attr("font-weight", (d) => (d.getMonth() === last_good_month_nr ? "bold" : "regular") );
 			d3_svg.append("text")
 					.attr("font-size", 9)
 					.attr("x", (self.width - self.margin.right - 4))
