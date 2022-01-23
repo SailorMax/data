@@ -708,7 +708,7 @@ class COVID19DATA
 				if (!empty($day_stat["confirmed"]))
 					$date_item["confirmed"] = $day_stat["confirmed"];
 				if (!empty($day_stat["recovered"]))
-					$date_item["vaccined"] = $day_stat["recovered"];
+					$date_item["recovered"] = $day_stat["recovered"];
 				if (!empty($day_stat["deaths"]))
 					$date_item["deaths"] = $day_stat["deaths"];
 			}
