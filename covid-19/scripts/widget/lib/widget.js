@@ -1676,6 +1676,7 @@ class Covid19Widget
 					.attr("cx", d => x_scale(d.date) + Math.round(x_scale.bandwidth()/2) )
 					.attr("cy", d => y_scale( funcDeathsValue(d) ) + self.margin.top )
 					.attr("fill", "red")
+					.on("click",	self.ShowHideHint)
 					.append("title")	// hint
 						.text( d => funcDeathsTitleValue(d) );
 			}
