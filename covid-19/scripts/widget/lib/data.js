@@ -11,14 +11,22 @@ class Covid19Data
 		this.CODE_COUNTRY = {};
 		this.COUNTRY_GROUPS = {};
 		this.TOP_REGIONS = {};
+		this.VRTI_LEVELS = {};
 
 		var self = this;
 		d3.json(myPath+"lib/shared_data.json", {cache:"force-cache"}).then(function(data)
 		{
 			self.COUNTRY_GROUPS = data.COUNTRY_GROUPS;
-			self.TOP_REGIONS = data.TOP_REGIONS;
 
+			self.TOP_REGIONS = data.TOP_REGIONS;
 			Object.keys(self.TOP_REGIONS).map(k => { if (self.COUNTRY_GROUPS[ self.TOP_REGIONS[k] ]) self.TOP_REGIONS[k] = self.COUNTRY_GROUPS[ self.TOP_REGIONS[k] ]; });
+
+			self.VRTI_LEVELS = data.VRTI_VOLGOGRAD;
+			Object.keys(self.VRTI_LEVELS).map(k => {
+													// add 10% because currently we use sum of 4 weeks per month in source data
+													self.VRTI_LEVELS[k][0] = self.VRTI_LEVELS[k][0] * 1.1;
+													self.VRTI_LEVELS[k][1] = self.VRTI_LEVELS[k][1] * 1.1;
+												});
 		});
 		d3.json(myPath+"lib/translates/"+lang+".json", {cache:"force-cache"}).then(function(data)
 		{

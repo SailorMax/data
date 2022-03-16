@@ -41,8 +41,12 @@
 		"deaths_per_confirmed_percent":	"deaths per sick (%)",
 		"deaths_per_100k":	"Deaths per 100,000 of population",
 
+		"per_100k":			"per 100,000 of population",
 		"vaccined":			"vaccined",
 		"unknown":			"unknown",
+
+		"vrti_mid_forecast": "average forecast for VRTI for 2018-2028 in the Volgograd region [7]",
+		"vrti_high_forecast": "high forecast for VRTI for 2018-2028 in the Volgograd region [7]",
 
 		"use_asymptomatic":		"use asymptomatic carriers (by minimum)",
 		"show_absolute_mortality_values":	"show absolute values of mortality",
@@ -96,6 +100,7 @@
 		"<a name=\"recovered\" class=\"footnote-number\">[3]</a> Data on the recovered may not be available!",
 		"<a name=\"sum_country\" class=\"footnote-number\">[4]</a> The countries with the sign ∑ are the sum of the values of the lower regions. Their population &ndash; this is the sum of the population of the mentioned regions only! For this reason the population of the group may not coincide with the population of the whole country.",
 		"<a name=\"asymptomatic\" class=\"footnote-number\">[5]</a> Number of asymptomatic carriers (distributors) on minimum estimates <a href=\"https://news.mail.ru/society/41415414/\" target=\"_blank\">is twice as high</a> as those with symptoms.",
-		"<a name=\"vaccined\" class=\"footnote-number\">[6]</a> Total vaccined, including not fully (only first dose)."
+		"<a name=\"vaccined\" class=\"footnote-number\">[6]</a> Total vaccined, including not fully (only first dose).",
+		"<a name=\"vrti_levels\" class=\"footnote-number\">[7]</a> Predicted incidence rates of VRTI are taken in the Volgograd region, as one of the highest in Russia, from <a href=\"https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fwww.rospotrebnadzor.ru%2Fupload%2F%25D0%2598%25D0%25A2%25D0%259E%25D0%2593-%25D0%259C%25D0%25A0%2520%25D1%258D%25D0%25BF%25D0%25B8%25D0%25B4%2520%25D0%25BF%25D0%25BE%25D1%2580%25D0%25BE%25D0%25B3%25D0%25B8%2520%25D0%25BF%25D0%25BE%2520%25D0%25B3%25D1%2580%25D0%25B8%25D0%25BF%25D0%25BF%25D1%2583.docx&wdOrigin=BROWSELINK\" target=\"_blank\">here</a>."
 	]
 }

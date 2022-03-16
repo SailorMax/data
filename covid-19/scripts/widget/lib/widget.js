@@ -1547,17 +1547,24 @@ class Covid19Widget
 					.text( Covid19DataTools.formatYearOnly(country_data[country_data.length-1].date) )
 					.select( function(){ return this.parentNode; } );
 
+
 			var funcDeathsValue;
 			var funcDeathsTitleValue;
+			var funcConfirmedValue;
+			var funcConfirmedTitleValue;
 			if (show_absolute_values)
 			{
-				funcDeathsValue = function(d) { return (population ? (d.deaths / population * 100000) : d.deaths) };
-				funcDeathsTitleValue = function(d) { return Covid19DataTools.minimizeFloat(population ? (d.deaths / population * 100000) : d.deaths) + " ("+d.deaths+")" };
+				funcDeathsValue = function(d) { return (population ? Math.round(d.deaths / population * 100000) : d.deaths) };
+				funcDeathsTitleValue = function(d) { return Covid19DataTools.numberFormat(population ? Math.round(d.deaths / population * 100000) : d.deaths) + " ("+Covid19DataTools.numberFormat(d.deaths)+")" };
+				funcConfirmedValue = function(d) { return (population ? Math.round(d.confirmed / population * 100000) : d.confirmed); }
+				funcConfirmedTitleValue = function(d) { return Covid19DataTools.numberFormat(population ? Math.round(d.confirmed / population * 100000) : d.confirmed) + " ("+Covid19DataTools.numberFormat(d.confirmed)+")" };
 			}
 			else
 			{
 				funcDeathsValue = function(d) { return (d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) };
-				funcDeathsTitleValue = function(d) { return Covid19DataTools.minimizeFloat(d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) + "% ("+d.deaths+")" };
+				funcDeathsTitleValue = function(d) { return Covid19DataTools.minimizeFloat(d.confirmed ? (d.deaths / d.confirmed * 100) : d.deaths) + "% ("+Covid19DataTools.numberFormat(d.deaths)+")" };
+				funcConfirmedValue = function(d) { return d.confirmed; }
+				funcConfirmedTitleValue = function(d) { return Covid19DataTools.numberFormat(d.confirmed) };
 			}
 
 			var deaths_per_confirmed = country_data.map( funcDeathsValue );
@@ -1576,7 +1583,8 @@ class Covid19Widget
 				)
 				.call(g => g.select(".domain").remove());
 
-			var max_new_confirmed = Covid19DataTools.GetMaxValueFromData(country_data, "confirmed");
+			var confirmed_list = country_data.map( funcConfirmedValue );
+			var max_new_confirmed = Math.max(...confirmed_list);
 
 			var y2_scale = d3.scaleLinear([Math.ceil(max_new_confirmed*1.3), 0], [0, self.height-self.margin.top-self.margin.bottom]);
 			d3_svg.append("g")
@@ -1592,6 +1600,33 @@ class Covid19Widget
 				.call(g => g.select(".domain").remove());
 			//
 
+			// background tolerance levels
+			if (show_absolute_values)
+			{
+				var tolerance_area = d3.area()
+										.x( d => x_scale(d.date) + x_scale.bandwidth()/2 )
+										.y0( d => y2_scale(0) + self.margin.top )
+										.y1( d => y2_scale(d.value) + self.margin.top );
+				var normal_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][0] };});
+				var tolerance_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][1] };});
+				d3_svg.append("g")
+					.selectAll()
+					.data([tolerance_levels])
+					.join("path")
+						.attr("fill", "#fdfbec")
+						.attr("d", tolerance_area)
+					.append("title")
+						.text(self.WORDS["vrti_high_forecast"]);
+				d3_svg.append("g")
+					.selectAll()
+					.data([normal_levels])
+					.join("path")
+						.attr("fill", "#eaffea")
+						.attr("d", tolerance_area)
+					.append("title")
+						.text(self.WORDS["vrti_mid_forecast"]);
+			}
+
 			// axis labels
 			d3_svg.append("text")
 				.attr("font-family", "sans-serif")
@@ -1599,7 +1634,16 @@ class Covid19Widget
 				.attr("fill", "red")
 				.attr("x", 0)
 				.attr("y", 10)
-				.text( (show_absolute_values ? self.WORDS["deaths_per_100k"] : self.WORDS["deaths_per_confirmed_percent"]).toLowerCase());
+				.text( (show_absolute_values ? self.WORDS["deaths"] : self.WORDS["deaths_per_confirmed_percent"]).toLowerCase());
+
+			if (show_absolute_values)
+				d3_svg.append("text")
+					.attr("font-family", "sans-serif")
+					.attr("font-size", 11)
+					.attr("fill", "#c0c0c0")
+					.attr("x", Math.round(self.width/2 - self.WORDS["per_100k"].length/2*5))
+					.attr("y", 10)
+					.text(self.WORDS["per_100k"]);
 
 			d3_svg.append("text")
 				.attr("font-family", "sans-serif")
@@ -1619,13 +1663,13 @@ class Covid19Widget
 
 				d3_virt_bars.join("rect")
 					.attr("x",		d => x_scale(d.date))
-					.attr("y",		d => y2_scale(d.confirmed) + self.margin.top)
-					.attr("height",	d => Math.max(0, y2_scale(0) - y2_scale(d.confirmed)))
+					.attr("y",		d => y2_scale(funcConfirmedValue(d)) + self.margin.top)
+					.attr("height",	d => Math.max(0, y2_scale(0) - y2_scale(funcConfirmedValue(d))))
 					.attr("width",	x_scale.bandwidth())
 					.attr("fill-opacity","0.3")
 					.on("click",	self.ShowHideHint)
 					.append("title")	// hint
-						.text(d => Covid19DataTools.GetFormattedNumber(d.confirmed));
+						.text( d => funcConfirmedTitleValue(d) );
 
 				d3_virt_bars.join("circle")
 					.attr("r", 3)
@@ -1665,7 +1709,7 @@ class Covid19Widget
 			}
 
 			// regression of infections
-			var confirmed_ratios = country_data.map( d => ({ "date":d.date, "value":d.confirmed }) );
+			var confirmed_ratios = country_data.map( d => ({ "date":d.date, "value":funcConfirmedValue(d) }) );
 			confirmed_ratios.pop();	// remove last month, because it is not finished
 //			var moving_average_data = Covid19DataTools.GetSimpleMovingWeightedAverage(confirmed_ratios, "value", confirmed_ratios.length, 2);
 //			var xy_list = moving_average_data.map((d,idx) => [idx, d.value]);
