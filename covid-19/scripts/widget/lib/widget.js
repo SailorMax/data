@@ -1601,14 +1601,17 @@ class Covid19Widget
 			//
 
 			// background tolerance levels
-			if (show_absolute_values)
+			if (show_absolute_values || population)
 			{
 				var tolerance_area = d3.area()
 										.x( d => x_scale(d.date) + x_scale.bandwidth()/2 )
 										.y0( d => y2_scale(0) + self.margin.top )
 										.y1( d => y2_scale(d.value) + self.margin.top );
-				var normal_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][0] };});
-				var tolerance_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][1] };});
+				var ratio_per_100k = 1;
+				if (!show_absolute_values)
+					ratio_per_100k = 100000 / population;
+				var normal_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][0]/ratio_per_100k };});
+				var tolerance_levels = country_data.map(d => {return { "date": d.date, "value": self.data.VRTI_LEVELS[d.date.getMonth()+1][1]/ratio_per_100k };});
 				d3_svg.append("g")
 					.selectAll()
 					.data([tolerance_levels])
